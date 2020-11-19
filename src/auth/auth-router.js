@@ -14,7 +14,7 @@ authRouter.route("/login").post(express.json(), (req, res, next) => {
     }
 
   authService
-    .getUserwithUsername(req.app.get("db"), user.username)
+    .getUserWithUsername(req.app.get("db"), user.username)
     .then((dbUser) => {
       if (!dbUser) {
         return res.status(400).json({ error: "Invalid credentials" });

@@ -7,7 +7,7 @@ const config = require("../config");
 const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/;
 
 const authService = {
-  getUserwithUsername(db, username) {
+  getUserWithUsername(db, username) {
     return db("users").where({ username }).first();
   },
   comparePasswords(password, hash) {
