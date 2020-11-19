@@ -4,6 +4,10 @@ const morgan = require("morgan");
 const cors = require("cors");
 const helmet = require("helmet");
 const { NODE_ENV } = require("./config");
+const authRouter = require("./auth/auth-router");
+const animeRouter = require("./anime/anime-router");
+const listRouter = require("./list/list-router");
+const searchRouter = require("./search/search-router");
 
 const app = express();
 
@@ -13,6 +17,10 @@ app.use(express.json());
 app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
+app.use("/api/auth", authRouter);
+app.use("/api/anime", animeRouter);
+app.use("/api/list", listRouter);
+app.use("/api/seacrch", searchRouter);
 app.use(function errorHandler(error, req, res, next) {
   let response;
   if (NODE_ENV === "production") {
