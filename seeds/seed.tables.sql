@@ -72,4 +72,12 @@ VALUES
 (1, 1, 1, 5),
 (2, 2, 1, 1),
 (3, 1, 2, 3);
+SELECT setval('users_user_id_seq', (SELECT MAX(user_id) from users));
+SELECT setval('anime_list_list_id_seq', (SELECT MAX(list_id) from anime_list));
+SELECT setval('anime_anime_id_seq', (SELECT MAX(anime_id) from anime));
+SELECT setval('list_anime_list_anime_id_seq', (SELECT MAX(list_anime_id) from list_anime));
+SELECT setval('genre_genre_id_seq', (SELECT MAX(genre_id) from genre));
+SELECT setval('keyword_keyword_id_seq', (SELECT MAX(keyword_id) from keyword));
+SELECT setval('comment_comment_id_seq', (SELECT MAX(comment_id) from comment));
+SELECT setval('rating_rating_id_seq', (SELECT MAX(rating_id) from rating));
 COMMIT;

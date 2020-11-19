@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const xss = require("xss");
@@ -30,12 +31,6 @@ const authService = {
       .first()
       .then((user) => !!user);
   },
-  hasUserWithId(db, user_id) {
-    return db("users")
-      .where({ user_id })
-      .first()
-      .then((user_id) => !!user_id);
-  },
   addUser(db, user) {
     return db("users")
       .insert(user)
@@ -44,7 +39,6 @@ const authService = {
   },
   serializeUser(user) {
     return {
-      id: xss(user.id),
       username: xss(user.username),
       email: xss(user.email),
     };
