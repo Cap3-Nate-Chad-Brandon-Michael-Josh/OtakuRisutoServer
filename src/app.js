@@ -21,9 +21,13 @@ app.use(cors());
 app.use("/api/auth", authRouter);
 app.use("/api/anime", animeRouter);
 // app.use("/api/list", listRouter);
+<<<<<<< HEAD
 // app.use("/api/anime", animeRouter);
 app.use("/api/list", listRouter);
 // app.use("/api/search", searchRouter);
+=======
+app.use("/api/search", searchRouter);
+>>>>>>> search-users
 app.use(function errorHandler(error, req, res, next) {
   let response;
   if (NODE_ENV === "production") {

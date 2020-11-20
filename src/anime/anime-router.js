@@ -48,7 +48,6 @@ animeRouter.delete("/", async (req, res, next) => {
     req.app.get("db"),
     list_anime_id
   );
-  console.log(list_id);
   if (!list_id) {
     return res.status(400).json({ error: "list_anime not found" });
   }
