@@ -1,6 +1,13 @@
 const xss = require('xss');
 
 const ListService = {
+    getAllUserLists(db, user_id){
+        return db
+            .from('anime_list')
+            .select('*')
+            .where('user_id', user_id)
+    },
+
     getListById(db, list_id) {
         return db
             .from('anime_list')
@@ -21,6 +28,7 @@ const ListService = {
             .select('*')
             .where('anime_id', anime_id)
     },
+
     getAllAnimeInfo(db, arr) {
         let result = [];
         const orig = [...arr];
@@ -45,6 +53,7 @@ const ListService = {
                 throw new Error(error)
             });
     },
+
     updateList(db, id, patchItem){
 
         return db('anime_list')
@@ -53,6 +62,7 @@ const ListService = {
             .returning('*')
             .then(item => item[0])
     },
+    
     updateUserList(db, id, patchItem, user_id){
         return new Promise((resolve, reject) => {
             ListService.getListById(db, id)

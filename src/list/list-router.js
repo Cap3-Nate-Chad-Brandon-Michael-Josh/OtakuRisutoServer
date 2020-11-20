@@ -1,8 +1,24 @@
 const express = require('express');
+const { requireAuth } = require('../middleware/JWT-auth');
 const ListService = require('./list-service');
 const jsonParser = express.json();
 
 const ListRouter = express.Router();
+
+ListRouter
+    .route('/')
+    .all(requireAuth)
+    .get(async (req, res, next) => {
+        const { user_id } = req.body;
+        if(!user_id){
+            user_id = req.user.user_id;
+        }
+        const lists = await ListService.getAllUserLists(
+            req.app.get('db'),
+            user_id
+        );
+        res.status(200).json(lists);
+    })
 
 ListRouter
     .route('/:id')
