@@ -44,6 +44,33 @@ const ListService = {
             .catch(error => {
                 throw new Error(error)
             });
+    },
+    updateList(db, id, patchItem){
+
+        return db('anime_list')
+            .where('list_id', id)
+            .update(patchItem)
+            .returning('*')
+            .then(item => item[0])
+    },
+    updateUserList(db, id, patchItem, user_id){
+        return new Promise((resolve, reject) => {
+            ListService.getListById(db, id)
+                .then(res => {
+                    if(res[0].user_id === user_id){
+                        ListService.updateList(db, id, patchItem)
+                            .then(item => {
+                                resolve(item)
+                            });
+                    } else {
+                        reject(`Mismatching user_id`)
+                    };
+                });
+        })
+        .then(updated => {
+            return updated;
+        })
+        .catch();
     }
 };
 
