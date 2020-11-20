@@ -14,6 +14,7 @@ animeRouter.post("/", async (req, res, next) => {
     return res.status(400).json({ error: "Missing list_id" });
   }
   let owner = await animeService.getListOwner(req.app.get("db"), list_id);
+
   if (owner.user_id !== req.user.user_id) {
     return res.status(404).json({ error: "Unauthorized request" });
   }
@@ -37,5 +38,28 @@ animeRouter.post("/", async (req, res, next) => {
   };
   animeService.addListAnime(req.app.get("db"), listAnime);
   res.json({ anime });
+});
+animeRouter.delete("/", async (req, res, next) => {
+  let { list_anime_id } = req.body;
+  if (!list_anime_id) {
+    return res.status(400).json({ error: "Missing list_anime_id" });
+  }
+  let list_id = await animeService.getLocation(
+    req.app.get("db"),
+    list_anime_id
+  );
+  console.log(list_id);
+  if (!list_id) {
+    return res.status(400).json({ error: "list_anime not found" });
+  }
+  let owner = await animeService.getListOwner(
+    req.app.get("db"),
+    list_id.list_id
+  );
+  if (owner.user_id !== req.user.user_id) {
+    return res.status(404).json({ error: "Unauthorized request" });
+  }
+  await animeService.deleteListAnime(req.app.get("db"), list_anime_id);
+  res.status(204).send(`Deleted ${list_anime_id}`);
 });
 module.exports = animeRouter;

@@ -40,6 +40,15 @@ const animeService = {
       .where({ list_id })
       .then(([owner]) => owner);
   },
+  getLocation(db, list_anime_id) {
+    return db("list_anime")
+      .select("list_id")
+      .where({ list_anime_id })
+      .then(([location]) => location);
+  },
+  deleteListAnime(db, list_anime_id) {
+    return db("list_anime").where({ list_anime_id }).del();
+  },
 };
 
 module.exports = animeService;
