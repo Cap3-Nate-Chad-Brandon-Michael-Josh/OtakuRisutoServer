@@ -21,24 +21,29 @@ const ListService = {
             .select('*')
             .where('anime_id', anime_id)
     },
-    async getAllAnimeInfo(db, arr) {
+    getAllAnimeInfo(db, arr) {
         let result = [];
         const orig = [...arr];
-        let temp;
-        // await orig.forEach(entry => {
-        //     this.getAnimeInfo(db, entry.anime_id)
-        //         .then((res) => {
-        //             console.log(res)
-        //             result.push(res[0])
-        //         });
-        // });
-        orig.forEach(async function(entry){
-            temp = await ListService.getAnimeInfo(db, entry.anime_id)
-            console.log(temp)
-                result.push(temp);
+        return new Promise((resolve, reject) => {
+            orig.forEach(entry => {
+                ListService.getAnimeInfo(db, entry.anime_id)
+                    .then(info => {
+                        if (!info) {
+                            reject(`No info for anime with id ${entry.anime_id}`)
+                        };
+                        result.push(info[0]);
+                        if (result.length === orig.length) {
+                            resolve(result);
+                        };
+                    })
+            })
         })
-        console.log('hi')
-        return result;
+            .then(res => {
+                return res;
+            })
+            .catch(error => {
+                throw new Error(error)
+            });
     }
 };
 
