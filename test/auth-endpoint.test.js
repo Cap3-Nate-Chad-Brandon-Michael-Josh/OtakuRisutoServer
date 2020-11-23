@@ -49,5 +49,51 @@ describe("Auth endpoints", () => {
         });
       });
     });
+    it("responds 200 ok and JWT auth token using secret when valid user login", () => {
+      const validLogin = {
+        username: testUser.username,
+        password: testUser.password,
+      };
+      const expectedToken = jwt.sign(
+        { user_id: testUser.user_id },
+        process.env.JWT_SECRET,
+        {
+          subject: testUser.username,
+          algorithm: "HS256",
+        }
+      );
+      return supertest(app)
+        .post("/api/auth/login")
+        .send(validLogin)
+        .expect(200, { authToken: expectedToken });
+    });
+  });
+  describe("POST /api/auth/register", () => {
+    beforeEach("insert users", () => helpers.seedUsersTable(db, testUsers));
+    const validUser = {
+      username: "newUser",
+      password: "P@ssword1",
+      email: "email1313@email.com",
+    };
+    it("Responds with 201 and a new user in database when given valid user", () => {
+      return supertest(app)
+        .post("/api/auth/register")
+        .send(validUser)
+        .expect(201)
+        .expect((res) => {
+          expect(res.body).to.have.property("username");
+          expect(res.body).to.have.property("email");
+        })
+        .expect(() => {
+          db.from("users")
+            .select("*")
+            .where({ username: validUser.username })
+            .first()
+            .then((row) => {
+              expect(row.username).to.eql(validUser.username);
+              expect(row.email).to.eql(validUser.email);
+            });
+        });
+    });
   });
 });

@@ -282,14 +282,17 @@ function cleanTables(db) {
 function prepUsers(users) {
   const preppedUsers = users.map((user) => ({
     user_id: user.user_id,
-    username: user.name,
+    username: user.username,
     password: bcrypt.hashSync(user.password, 1),
     email: user.email,
   }));
   return preppedUsers;
 }
-function seedUsersTable(db, users) {
-  return db.into("users").insert(prepUsers(users));
+async function seedUsersTable(db, users) {
+  await db.into("users").insert(prepUsers(users));
+  return db.raw(
+    `SELECT setval('users_user_id_seq', (SELECT MAX(user_id) from users));`
+  );
 }
 function seedAnimeListTable(db, animeList) {
   return db.into("anime_list").insert(animeList);
@@ -329,8 +332,5 @@ module.exports = {
   seedListAnimeTable,
   seedCommentTable,
   seedRatingTable,
-<<<<<<< HEAD
-=======
   cleanTables,
->>>>>>> auth-test
 };
