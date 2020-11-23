@@ -1,4 +1,0 @@
-DROP TABLE IF EXISTS genre;
-DROP TABLE IF EXISTS keyword;
-ALTER TABLE anime
-ADD genre text[]
