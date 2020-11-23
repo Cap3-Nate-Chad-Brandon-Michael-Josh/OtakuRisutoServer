@@ -61,16 +61,30 @@ const ListService = {
             .then(res => res[0])
     },
 
-    deleteList(db, list_id) {
+    deleteList(db, list_id, user_id) {
+        console.log(list_id)
         return new Promise((resolve, reject) => {
-            ListService.deleteAllListAnime(db, list_id)
-                .then(() => {
-                    ListService.deleteListAtId(db, list_id)
-                        .then(() => {
-                            resolve();
-                        })
+            ListService.getListById(db, list_id)
+                .then(list => {
+                    if (user_id != list[0].user_id) {
+                        reject(`Mismatching user_id`)
+                    } else {
+                        ListService.deleteAllListAnime(db, list_id)
+                            .then(() => {
+                                ListService.deleteListAtId(db, list_id)
+                                    .then(() => {
+                                        resolve();
+                                    })
+                            })
+                    }
                 })
         })
+        .then(res => {
+            return res;
+        })
+        .catch(error => {
+            throw new Error(error)
+        });
     },
 
     deleteListAtId(db, list_id) {

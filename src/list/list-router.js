@@ -51,19 +51,21 @@ ListRouter
                 req.app.get('db'),
                 req.params.id
             );
-            if (!list){
+            if (list.length === 0){
                 return res.status(400).json({
                     error: `List at given id not found`,
                 })
+            } else{
+                console.log(list)
+                list[0].list_anime = await ListService.getAnimeInList(
+                    req.app.get('db'),
+                    req.params.id
+                );
+                list[0].anime = await ListService.getAllAnimeInfo(
+                    req.app.get('db'),
+                    list[0].list_anime
+                )
             }
-            list[0].list_anime = await ListService.getAnimeInList(
-                req.app.get('db'),
-                req.params.id
-            );
-            list[0].anime = await ListService.getAllAnimeInfo(
-                req.app.get('db'),
-                list[0].list_anime
-            )
 
             if(list.length === 0){
                 return res.status(400).json({
@@ -97,12 +99,19 @@ ListRouter
         .catch(next)
     })
     .delete(async(req, res, next) => {
-     console.log(req.body.list_id)
-        await ListService.deleteList(
-            req.app.get('db'),
-            req.body.list_id
-        );
-        res.status(204).send(`List Deleted.`)
+        const user_id = req.user.user_id;
+        console.log(req.body.list_id)
+
+        try {
+            await ListService.deleteList(
+                req.app.get('db'),
+                req.body.list_id,
+                user_id
+            );
+            res.status(204).send(`List Deleted.`)
+        } catch (error) {
+            next(error);
+        }
     })
 
 module.exports = ListRouter
