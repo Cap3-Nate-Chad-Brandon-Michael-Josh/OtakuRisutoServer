@@ -4,7 +4,7 @@ const app = require("../src/app");
 const helpers = require("./test-helpers");
 const { expect } = require("chai");
 
-describe.only("search endpoint", () => {
+describe("search endpoint", () => {
   let db;
   const testUsers = helpers.makeUsersArray();
   const testUser = testUsers[0];
