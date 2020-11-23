@@ -62,7 +62,6 @@ const ListService = {
     },
 
     deleteList(db, list_id, user_id) {
-        console.log(list_id)
         return new Promise((resolve, reject) => {
             ListService.getListById(db, list_id)
                 .then(list => {
