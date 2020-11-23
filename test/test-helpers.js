@@ -73,8 +73,8 @@ function makeAnimeListArray() {
     {
       list_id: 8,
       user_id: 2,
-      name: "isekai",
-      private: false,
+      name: "ecchi",
+      private: true,
     },
     {
       list_id: 9,
