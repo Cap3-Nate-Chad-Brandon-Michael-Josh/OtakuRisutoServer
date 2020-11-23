@@ -329,4 +329,8 @@ module.exports = {
   seedListAnimeTable,
   seedCommentTable,
   seedRatingTable,
+<<<<<<< HEAD
+=======
+  cleanTables,
+>>>>>>> auth-test
 };
