@@ -14,12 +14,17 @@ const animeService = {
       .then(([anime]) => anime);
   },
   serializeAnime(anime) {
+    let temp = [];
+    for (let i = 0; i < anime.genre.length; i++) {
+      temp.push(xss(anime.genre[i]));
+    }
     return {
       title: xss(anime.title),
       description: xss(anime.description),
       image_url: xss(anime.image_url),
       rating: anime.rating,
       episode_count: anime.episode_count,
+      genre: temp,
     };
   },
   addListAnime(db, listAnime) {

@@ -32,6 +32,7 @@ animeRouter.post("/", async (req, res, next) => {
     req.app.get("db"),
     anime.title
   );
+
   let listAnime = {
     list_id,
     anime_id: dbAnime[0].anime_id,
