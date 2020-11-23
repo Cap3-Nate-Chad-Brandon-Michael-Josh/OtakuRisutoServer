@@ -1,7 +1,7 @@
 const xss = require('xss');
 
 const ListService = {
-    getAllUserLists(db, user_id){
+    getAllUserLists(db, user_id) {
         return db
             .from('anime_list')
             .select('*')
@@ -54,14 +54,38 @@ const ListService = {
             });
     },
 
-    addList(db, info){
+    addList(db, info) {
         return db('anime_list')
             .insert(info)
             .returning('*')
             .then(res => res[0])
     },
 
-    updateList(db, id, patchItem){
+    deleteList(db, list_id) {
+        return new Promise((resolve, reject) => {
+            ListService.deleteAllListAnime(db, list_id)
+                .then(() => {
+                    ListService.deleteListAtId(db, list_id)
+                        .then(() => {
+                            resolve();
+                        })
+                })
+        })
+    },
+
+    deleteListAtId(db, list_id) {
+        return db('anime_list')
+            .where('list_id', list_id)
+            .del();
+    },
+
+    deleteAllListAnime(db, list_id) {
+        return db('list_anime')
+            .where('list_id', list_id)
+            .del();
+    },
+
+    updateList(db, id, patchItem) {
 
         return db('anime_list')
             .where('list_id', id)
@@ -69,12 +93,12 @@ const ListService = {
             .returning('*')
             .then(item => item[0])
     },
-    
-    updateUserList(db, id, patchItem, user_id){
+
+    updateUserList(db, id, patchItem, user_id) {
         return new Promise((resolve, reject) => {
             ListService.getListById(db, id)
                 .then(res => {
-                    if(res[0].user_id === user_id){
+                    if (res[0].user_id === user_id) {
                         ListService.updateList(db, id, patchItem)
                             .then(item => {
                                 resolve(item)
@@ -84,10 +108,10 @@ const ListService = {
                     };
                 });
         })
-        .then(updated => {
-            return updated;
-        })
-        .catch();
+            .then(updated => {
+                return updated;
+            })
+            .catch();
     }
 };
 

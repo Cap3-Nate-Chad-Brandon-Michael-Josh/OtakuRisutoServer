@@ -40,7 +40,7 @@ ListRouter
                 )
             })
         });
-        res.status(204).send(`List successfully added`);
+        res.status(201).send(`List successfully added`);
     })
 
 ListRouter
@@ -51,6 +51,11 @@ ListRouter
                 req.app.get('db'),
                 req.params.id
             );
+            if (!list){
+                return res.status(400).json({
+                    error: `List at given id not found`,
+                })
+            }
             list[0].list_anime = await ListService.getAnimeInList(
                 req.app.get('db'),
                 req.params.id
@@ -90,6 +95,14 @@ ListRouter
             res.status(200).json(item)
         })
         .catch(next)
+    })
+    .delete(async(req, res, next) => {
+     console.log(req.body.list_id)
+        await ListService.deleteList(
+            req.app.get('db'),
+            req.body.list_id
+        );
+        res.status(204).send(`List Deleted.`)
     })
 
 module.exports = ListRouter

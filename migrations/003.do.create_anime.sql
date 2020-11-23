@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS anime(
   title VARCHAR(100) NOT NULL,
   description TEXT NOT NULL,
   image_url TEXT NOT NULL,
-  rating INTEGER,
-  episode_count INTEGER
+  rating FLOAT,
+  episode_count INTEGER,
+  genre text[]
 )
