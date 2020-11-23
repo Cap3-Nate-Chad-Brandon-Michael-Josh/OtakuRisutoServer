@@ -93,6 +93,7 @@ function makeAnimeArray() {
       image_url: "testanimeimage1",
       rating: 2,
       episode_count: 1,
+      genre: ["test1, test2"],
     },
     {
       anime_id: 2,
@@ -101,6 +102,7 @@ function makeAnimeArray() {
       image_url: "testanimeimage2",
       rating: 3,
       episode_count: 2,
+      genre: ["test3, test4"],
     },
     {
       anime_id: 3,
@@ -109,6 +111,7 @@ function makeAnimeArray() {
       image_url: "testanimeimage3",
       rating: 4,
       episode_count: 3,
+      genre: ["test5, test6"],
     },
     {
       anime_id: 4,
@@ -117,6 +120,7 @@ function makeAnimeArray() {
       image_url: "testanimeimage4",
       rating: 5,
       episode_count: 4,
+      genre: ["test7, test8"],
     },
     {
       anime_id: 5,
@@ -125,6 +129,7 @@ function makeAnimeArray() {
       image_url: "testanimeimage5",
       rating: 5,
       episode_count: 5,
+      genre: ["test9, test10"],
     },
     {
       anime_id: 6,
@@ -133,6 +138,7 @@ function makeAnimeArray() {
       image_url: "testanimeimage6",
       rating: 4,
       episode_count: 6,
+      genre: ["test11, test12"],
     },
   ];
 }
@@ -294,20 +300,35 @@ async function seedUsersTable(db, users) {
     `SELECT setval('users_user_id_seq', (SELECT MAX(user_id) from users));`
   );
 }
-function seedAnimeListTable(db, animeList) {
-  return db.into("anime_list").insert(animeList);
+async function seedAnimeListTable(db, animeList) {
+  await db.into("anime_list").insert(animeList);
+  return db.raw(
+    `SELECT setval('anime_list_list_id_seq', (SELECT MAX(list_id) from anime_list));`
+  );
 }
-function seedAnimeTable(db, anime) {
-  return db.into("anime").insert(anime);
+async function seedAnimeTable(db, anime) {
+  await db.into("anime").insert(anime);
+  return db.raw(
+    `SELECT setval('anime_anime_id_seq', (SELECT MAX(anime_id) from anime));`
+  );
 }
-function seedListAnimeTable(db, listAnime) {
-  return db.into("list_anime").insert(listAnime);
+async function seedListAnimeTable(db, listAnime) {
+  await db.into("list_anime").insert(listAnime);
+  return db.raw(
+    `SELECT setval('list_anime_list_anime_id_seq', (SELECT MAX(list_anime_id) from list_anime));`
+  );
 }
-function seedCommentTable(db, comments) {
-  return db.into("comment").insert(comments);
+async function seedCommentTable(db, comments) {
+  await db.into("comment").insert(comments);
+  return db.raw(
+    `SELECT setval('comment_comment_id_seq', (SELECT MAX(comment_id) from comment));`
+  );
 }
-function seedRatingTable(db, ratings) {
-  return db.into("rating").insert(ratings);
+async function seedRatingTable(db, ratings) {
+  await db.into("rating").insert(ratings);
+  return db.raw(
+    `SELECT setval('rating_rating_id_seq', (SELECT MAX(rating_id) from rating));`
+  );
 }
 //might throw an error, need to see how sign works behind the scenes. if so, user_id should be id
 function makeAuthHeader(user, secret = process.env.JWT_SECRET) {

@@ -38,7 +38,7 @@ animeRouter.post("/", async (req, res, next) => {
     anime_id: dbAnime[0].anime_id,
   };
   animeService.addListAnime(req.app.get("db"), listAnime);
-  res.json({ anime });
+  res.status(201).json({ anime });
 });
 animeRouter.delete("/", async (req, res, next) => {
   let { list_anime_id } = req.body;
