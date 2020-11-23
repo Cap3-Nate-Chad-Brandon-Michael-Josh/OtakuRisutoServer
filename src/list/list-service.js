@@ -54,6 +54,13 @@ const ListService = {
             });
     },
 
+    addList(db, info){
+        return db('anime_list')
+            .insert(info)
+            .returning('*')
+            .then(res => res[0])
+    },
+
     updateList(db, id, patchItem){
 
         return db('anime_list')
