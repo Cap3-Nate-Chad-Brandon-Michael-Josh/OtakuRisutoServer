@@ -21,23 +21,36 @@ ListRouter
         res.status(200).json(lists);
     })
     .post(async (req, res, next) => {
-        const { list_anime, name, private } = req.body;
+        const { anime, name, private } = req.body;
         const user_id = req.user.user_id;
         const listObj = { user_id, name, private}
+        
         await ListService.addList(
             req.app.get('db'),
             listObj
         )
         .then(async (res) => {
-            await list_anime.forEach(async item => {
-                const listAnime = {
+            await anime.forEach(async item => {
+                let exists = await animeService.hasAnimeWithTitle(
+                    req.app.get("db"),
+                    item.title
+                  );
+                  if (!exists) {
+                    await animeService.addAnime(
+                      req.app.get("db"),
+                      animeService.serializeAnime(item)
+                    );
+                  }
+                  let dbAnime = await animeService.getAnimeByTitle(
+                    req.app.get("db"),
+                    item.title
+                  );
+                
+                  let listAnime = {
                     list_id: res.list_id,
-                    anime_id: item.anime_id
-                }
-                await animeService.addListAnime(
-                    req.app.get('db'),
-                    listAnime
-                )
+                    anime_id: dbAnime[0].anime_id,
+                  };
+                  animeService.addListAnime(req.app.get("db"), listAnime);
             })
         });
         res.status(201).send(`List successfully added`);
@@ -56,7 +69,6 @@ ListRouter
                     error: `List at given id not found`,
                 })
             } else{
-                console.log(list)
                 list[0].list_anime = await ListService.getAnimeInList(
                     req.app.get('db'),
                     req.params.id
