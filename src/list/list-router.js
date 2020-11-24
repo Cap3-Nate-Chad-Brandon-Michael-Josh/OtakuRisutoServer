@@ -20,6 +20,12 @@ ListRouter.route("/")
     const { anime, name, private } = req.body;
     const user_id = req.user.user_id;
     const listObj = { user_id, name, private };
+    if (!name || typeof name !== "string") {
+      return res.status(400).json("Invalid name");
+    }
+    if (!private || typeof private !== "boolean") {
+      return res.status(400).json("Invalid private");
+    }
 
     await ListService.addList(req.app.get("db"), listObj).then(async (res) => {
       await anime.forEach(async (item) => {
@@ -102,9 +108,16 @@ ListRouter.route("/:id")
     }
   })
   .patch(jsonParser, (req, res, next) => {
+    let { name, private } = req.body;
+    if (!name) {
+      return res.status(400).json("Missing name");
+    }
+    if (!private) {
+      return res.status(400).json("Missing private");
+    }
     const patchItem = {
-      name: req.body.name,
-      private: req.body.private,
+      name,
+      private,
     };
     const user_id = req.user.user_id;
     const id = req.params.id;
@@ -116,14 +129,12 @@ ListRouter.route("/:id")
   })
   .delete(async (req, res, next) => {
     const user_id = req.user.user_id;
-    console.log(req.body.list_id);
-
+    const { list_id } = req.body;
+    if (!list_id) {
+      return res.status(400).json("Missing list_id");
+    }
     try {
-      await ListService.deleteList(
-        req.app.get("db"),
-        req.body.list_id,
-        user_id
-      );
+      await ListService.deleteList(req.app.get("db"), list_id, user_id);
       res.status(204).send(`List Deleted.`);
     } catch (error) {
       next(error);
@@ -145,5 +156,39 @@ ListRouter.route("/comment").post(async (req, res, next) => {
   let dbComment = await ListService.addComment(req.app.get("db"), newComment);
   return res.status(201).json(dbComment);
 });
-
+ListRouter.route("/rating").post(async (req, res, next) => {
+  let { rating, list_id } = req.body;
+  if (!rating || typeof rating !== "number" || rating > 5 || rating < 1) {
+    return res.status(400).json({ error: "Invalid rating" });
+  }
+  if (!list_id) {
+    return res.status(400).json({ error: "Missing list_id" });
+  }
+  let alreadyRated = false;
+  let usersWhoRated = await ListService.getUsersWhoRated(
+    req.app.get("db"),
+    list_id
+  );
+  for (let i = 0; i < usersWhoRated.length; i++) {
+    if (usersWhoRated[i].rating_user_id === req.user.user_id) {
+      alreadyRated = true;
+    }
+  }
+  if (alreadyRated) {
+    let dbRating = await ListService.updateRating(
+      req.app.get("db"),
+      list_id,
+      req.user.user_id,
+      rating
+    );
+    return res.status(201).json(dbRating);
+  }
+  newRating = {
+    rating_user_id: req.user.user_id,
+    rating,
+    list_id,
+  };
+  let dbRating = await ListService.addRating(req.app.get("db"), newRating);
+  res.status(201).json(dbRating);
+});
 module.exports = ListRouter;

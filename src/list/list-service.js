@@ -135,6 +135,22 @@ const ListService = {
       .returning("*")
       .then(([comment]) => comment);
   },
+  getUsersWhoRated(db, list_id) {
+    return db("rating").select("rating_user_id").where({ list_id });
+  },
+  updateRating(db, list_id, rating_user_id, rating) {
+    return db("rating")
+      .where({ list_id, rating_user_id })
+      .update({ rating })
+      .returning("*")
+      .then(([rating]) => rating);
+  },
+  addRating(db, rating) {
+    return db("rating")
+      .insert(rating)
+      .returning("*")
+      .then(([rating]) => rating);
+  },
 };
 
 module.exports = ListService;
