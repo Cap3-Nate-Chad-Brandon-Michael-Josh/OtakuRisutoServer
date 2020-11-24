@@ -16,7 +16,7 @@ animeRouter.post("/", async (req, res, next) => {
   let owner = await animeService.getListOwner(req.app.get("db"), list_id);
 
   if (owner.user_id !== req.user.user_id) {
-    return res.status(404).json({ error: "Unauthorized request" });
+    return res.status(401).json({ error: "Unauthorized request" });
   }
   let exists = await animeService.hasAnimeWithTitle(
     req.app.get("db"),
@@ -57,7 +57,7 @@ animeRouter.delete("/", async (req, res, next) => {
     list_id.list_id
   );
   if (owner.user_id !== req.user.user_id) {
-    return res.status(404).json({ error: "Unauthorized request" });
+    return res.status(401).json({ error: "Unauthorized request" });
   }
   await animeService.deleteListAnime(req.app.get("db"), list_anime_id);
   res.status(204).send(`Deleted ${list_anime_id}`);

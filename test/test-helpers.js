@@ -330,7 +330,7 @@ async function seedRatingTable(db, ratings) {
     `SELECT setval('rating_rating_id_seq', (SELECT MAX(rating_id) from rating));`
   );
 }
-//might throw an error, need to see how sign works behind the scenes. if so, user_id should be id
+
 function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
   const token = jwt.sign({ user_id: user.user_id }, secret, {
     subject: user.username,
