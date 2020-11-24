@@ -68,6 +68,10 @@ ListRouter.route("/:id")
           rating = 0;
         }
         list[0].rating = rating;
+        list[0].comments = await ListService.getListComments(
+          req.app.get("db"),
+          req.params.id
+        );
         list[0].list_anime = await ListService.getAnimeInList(
           req.app.get("db"),
           req.params.id
