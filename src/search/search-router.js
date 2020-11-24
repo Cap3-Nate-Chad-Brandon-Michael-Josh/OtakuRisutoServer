@@ -1,11 +1,11 @@
 const express = require("express");
-const searchService = require("./seach-service");
+const searchService = require("./search-service");
 const { requireAuth } = require("../middleware/JWT-auth");
 
-const serachRouter = express.Router();
-serachRouter.use(requireAuth);
+const searchRouter = express.Router();
+searchRouter.use(requireAuth);
 
-serachRouter.get("/users/:term", async (req, res, next) => {
+searchRouter.get("/users/:term", async (req, res, next) => {
   let term = req.params.term;
   let users = await searchService.getUsers(req.app.get("db"));
   let result = searchService.filterUsersByName(users, term);
@@ -16,7 +16,7 @@ serachRouter.get("/users/:term", async (req, res, next) => {
   }
   res.json(result);
 });
-serachRouter.get("/lists/:term", async (req, res, next) => {
+searchRouter.get("/lists/:term", async (req, res, next) => {
   let term = req.params.term;
   let lists = await searchService.getLists(req.app.get("db"));
   let filteredList = searchService.filterListsByName(lists, term);
@@ -44,4 +44,4 @@ serachRouter.get("/lists/:term", async (req, res, next) => {
   }
   res.json(result);
 });
-module.exports = serachRouter;
+module.exports = searchRouter;
