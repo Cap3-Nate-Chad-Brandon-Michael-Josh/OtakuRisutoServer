@@ -72,6 +72,12 @@ ListRouter.route("/:id")
           req.app.get("db"),
           req.params.id
         );
+        for (let i = 0; i < list[0].comments.length; i++) {
+          list[0].comments[i].username = await ListService.getCommentUsername(
+            req.app.get("db"),
+            list[0].comments[i].comment_user_id
+          );
+        }
         list[0].list_anime = await ListService.getAnimeInList(
           req.app.get("db"),
           req.params.id

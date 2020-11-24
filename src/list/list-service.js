@@ -120,6 +120,12 @@ const ListService = {
     let result = parseFloat((sum / ratingArr.length).toFixed(2));
     return result;
   },
+  getCommentUsername(db, comment_user_id) {
+    return db("users")
+      .select("username")
+      .where({ user_id: comment_user_id })
+      .then(([{ username }]) => username);
+  },
   getListComments(db, list_id) {
     return db("comment").select("*").where({ list_id }).orderBy("comment_id");
   },
