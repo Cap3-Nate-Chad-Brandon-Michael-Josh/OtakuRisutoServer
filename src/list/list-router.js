@@ -129,5 +129,21 @@ ListRouter.route("/:id")
       next(error);
     }
   });
+ListRouter.route("/comment").post(async (req, res, next) => {
+  let { comment, list_id } = req.body;
+  if (!comment) {
+    return res.status(400).json({ error: "Missing comment" });
+  }
+  if (!list_id) {
+    return res.status(400).json({ error: "Missing list_id" });
+  }
+  let newComment = {
+    comment_user_id: req.user.user_id,
+    list_id,
+    comment,
+  };
+  let dbComment = await ListService.addComment(req.app.get("db"), newComment);
+  return res.status(201).json(dbComment);
+});
 
 module.exports = ListRouter;

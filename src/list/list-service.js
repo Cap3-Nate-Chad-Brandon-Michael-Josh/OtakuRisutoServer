@@ -129,6 +129,12 @@ const ListService = {
   getListComments(db, list_id) {
     return db("comment").select("*").where({ list_id }).orderBy("comment_id");
   },
+  addComment(db, comment) {
+    return db("comment")
+      .insert(comment)
+      .returning("*")
+      .then(([comment]) => comment);
+  },
 };
 
 module.exports = ListService;
