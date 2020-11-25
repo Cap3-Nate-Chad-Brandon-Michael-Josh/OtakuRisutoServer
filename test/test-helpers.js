@@ -257,13 +257,13 @@ function makeRatingArray() {
     {
       rating_id: 1,
       rating_user_id: 1,
-      list_id: 1,
+      list_id: 9,
       rating: 5,
     },
     {
       rating_id: 2,
       rating_user_id: 2,
-      list_id: 1,
+      list_id: 9,
       rating: 1,
     },
     {
@@ -420,6 +420,47 @@ function makeExpectedListAnimeArr() {
     },
   ];
 }
+function calculateListRating(list) {
+  let ratings = makeRatingArray().filter(
+    (rating) => rating.list_id === list.list_id
+  );
+  let sum = 0;
+  for (let i = 0; i < ratings.length; i++) {
+    sum = sum + ratings[i].rating;
+  }
+  let result = parseFloat((sum / ratings.length).toFixed(2));
+  return result;
+}
+
+function makeExpectedAnimeArr(listAnimeArr) {
+  let result = [];
+  let anime = makeAnimeArray();
+  for (let i = 0; i < listAnimeArr.length; i++) {
+    result.push(
+      anime.find((animeItem) => animeItem.anime_id === listAnimeArr.anime_id)
+    );
+  }
+  return result;
+}
+function makeExpectedList(list) {
+  let comments = makeCommentArray().filter(
+    (comment) => comment.list_id === list.list_id
+  );
+  let listAnime = makeListAnimeArray().filter(
+    (listAnime) => listAnime.list_id === list.list_id
+  );
+  let anime = makeExpectedAnimeArr(listAnime);
+  return {
+    list_id: list.list_id,
+    user_id: list.user_id,
+    name: list.name,
+    private: list.private,
+    rating: calculateListRating(list),
+    comments: comments,
+    list_anime: listAnime,
+    anime: anime,
+  };
+}
 module.exports = {
   makeUsersArray,
   makeAnimeListArray,
@@ -438,4 +479,5 @@ module.exports = {
   makeExpectedListArr,
   makeNewAnimeArr,
   makeExpectedListAnimeArr,
+  makeExpectedList,
 };

@@ -57,10 +57,8 @@ ListRouter.route('/')
           list_id: res.list_id,
         };
         await animeService.addListAnime(req.app.get('db'), listAnime);
-        console.log('ANIIIIMEEEE ID', dbAnime[0].anime_id);
       }
     });
-    console.log('sent');
     return res.status(201).send(`List successfully added`);
   });
 
@@ -103,16 +101,13 @@ ListRouter.route('/:id')
           list[0].list_anime
         );
       }
-
       if (list.length === 0) {
         return res.status(400).json({
           error: `Please send a proper list id`,
         });
-      } else {
-        res.status(200).json(list[0]);
       }
 
-      next();
+      return res.status(200).json(list[0]);
     } catch (error) {
       next(error);
     }

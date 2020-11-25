@@ -72,14 +72,12 @@ describe.only('list endpoint', () => {
               .where({ user_id: testUser.user_id });
           })
           .then((res) => {
-            console.log('RESULT', res);
             expect(res[res.length - 1].name).to.eql(body.name);
             return db
               .from('list_anime')
               .select('*')
               .where({ list_id: res[res.length - 1].list_id })
               .then((res) => {
-                console.log('RESULT', res);
                 expect(res).to.eql(helpers.makeExpectedListAnimeArr());
               });
           });
@@ -104,13 +102,13 @@ describe.only('list endpoint', () => {
       return helpers.seedRatingTable(db, ratingArr);
     });
     afterEach('cleanup', () => helpers.cleanTables(db));
-  });
-  describe('GET api/list/:id', () => {
-    it('should return 200 and a list object containing rating, comments, an array of list_anime objects, and an array of anime objects', () => {
-      return supertest(app)
-        .get(`/api/list/${animeList.list_id}`)
-        .set('Authorization', helpers.makeAuthHeader(testUser))
-        .expect();
+    describe('GET api/list/:id', () => {
+      it('should return 200 and a list object containing rating, comments, an array of list_anime objects, and an array of anime objects', () => {
+        return supertest(app)
+          .get(`/api/list/${animeList.list_id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(helpers.makeExpectedList(animeList));
+      });
     });
   });
 });

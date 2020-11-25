@@ -12,31 +12,21 @@ const ListService = {
   },
 
   getAnimeInfo(db, anime_id) {
+    console.log('called');
     return db.from('anime').select('*').where('anime_id', anime_id);
   },
 
-  getAllAnimeInfo(db, arr) {
+  getAllAnimeInfo: async function (db, arr) {
     let result = [];
     const orig = [...arr];
-    return new Promise((resolve, reject) => {
-      orig.forEach((entry) => {
-        ListService.getAnimeInfo(db, entry.anime_id).then((info) => {
-          if (!info) {
-            reject(`No info for anime with id ${entry.anime_id}`);
-          }
-          result.push(info[0]);
-          if (result.length === orig.length) {
-            resolve(result);
-          }
-        });
-      });
-    })
-      .then((res) => {
-        return res;
-      })
-      .catch((error) => {
-        throw new Error(error);
-      });
+    for (let i = 0; i < orig.length; i++) {
+      let info = await this.getAnimeInfo(db, orig[i].anime_id);
+      if (!info) {
+        throw new Error(`No info for anime with id ${orig[i].anime_id}`);
+      }
+      result.push(info[0]);
+    }
+    return result;
   },
 
   addList(db, info) {
