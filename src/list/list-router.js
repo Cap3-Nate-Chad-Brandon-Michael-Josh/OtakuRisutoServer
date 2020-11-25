@@ -32,7 +32,7 @@ ListRouter.route('/')
     }
 
     await ListService.addList(req.app.get('db'), listObj).then(async (res) => {
-      await anime.forEach(async (item) => {
+      for (let item of anime) {
         let exists = await animeService.hasAnimeWithTitle(
           req.app.get('db'),
           item.title
@@ -47,15 +47,17 @@ ListRouter.route('/')
           req.app.get('db'),
           item.title
         );
-        console.log('ANIIIIMEEEE ID', dbAnime[0].anime_id);
+
         let listAnime = {
           anime_id: dbAnime[0].anime_id,
           list_id: res.list_id,
         };
         await animeService.addListAnime(req.app.get('db'), listAnime);
-      });
+        console.log('ANIIIIMEEEE ID', dbAnime[0].anime_id);
+      }
     });
-    res.status(201).send(`List successfully added`);
+    console.log('sent');
+    return res.status(201).send(`List successfully added`);
   });
 
 ListRouter.route('/:id')

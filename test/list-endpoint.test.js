@@ -58,7 +58,7 @@ describe.only('list endpoint', () => {
           name: 'testy',
           private: false,
         };
-        console.log(body);
+
         return supertest(app)
           .post('/api/list')
           .set('Authorization', helpers.makeAuthHeader(testUser))
