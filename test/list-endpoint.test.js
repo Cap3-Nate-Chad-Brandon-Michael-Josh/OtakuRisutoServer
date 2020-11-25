@@ -14,6 +14,7 @@ describe.only('list endpoint', () => {
   const anime = animeArr[0];
   const listAnimeArr = helpers.makeListAnimeArray();
   const listAnime = listAnimeArr[0];
+  const ratingArr = helpers.makeRatingArray();
 
   before('make knex instance', () => {
     db = knex({
@@ -83,6 +84,33 @@ describe.only('list endpoint', () => {
               });
           });
       });
+    });
+  });
+  describe('/api/list/:id', () => {
+    beforeEach('insert users', () => {
+      return helpers.seedUsersTable(db, testUsers);
+    });
+
+    beforeEach('insert anime', () => {
+      return helpers.seedAnimeTable(db, animeArr);
+    });
+    beforeEach('insert anime-lists', () => {
+      return helpers.seedAnimeListTable(db, animeListArr);
+    });
+    beforeEach('insert list_anime', () => {
+      return helpers.seedListAnimeTable(db, listAnimeArr);
+    });
+    beforeEach('insert ratings', () => {
+      return helpers.seedRatingTable(db, ratingArr);
+    });
+    afterEach('cleanup', () => helpers.cleanTables(db));
+  });
+  describe('GET api/list/:id', () => {
+    it('should return 200 and a list object containing rating, comments, an array of list_anime objects, and an array of anime objects', () => {
+      return supertest(app)
+        .get(`/api/list/${animeList.list_id}`)
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .expect();
     });
   });
 });

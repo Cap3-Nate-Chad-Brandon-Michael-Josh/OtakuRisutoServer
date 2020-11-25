@@ -32,6 +32,10 @@ ListRouter.route('/')
     }
 
     await ListService.addList(req.app.get('db'), listObj).then(async (res) => {
+      //TO DO: clean this up, unnecessarrily hammering database.
+      //where not in
+      //where title not in (select title from anime)
+
       for (let item of anime) {
         let exists = await animeService.hasAnimeWithTitle(
           req.app.get('db'),
@@ -105,7 +109,7 @@ ListRouter.route('/:id')
           error: `Please send a proper list id`,
         });
       } else {
-        res.status(200).json(list);
+        res.status(200).json(list[0]);
       }
 
       next();
