@@ -10,10 +10,7 @@ ListRouter.use(jsonParser);
 ListRouter.route('/')
 
   .get(async (req, res, next) => {
-    let { user_id } = req.body;
-    if (!user_id) {
-      user_id = req.user.user_id;
-    }
+    let user_id = req.user.user_id;
     const lists = await ListService.getAllUserLists(req.app.get('db'), user_id);
     res.status(200).json(lists);
   })
@@ -195,5 +192,12 @@ ListRouter.route('/rating').post(async (req, res, next) => {
   };
   let dbRating = await ListService.addRating(req.app.get('db'), newRating);
   res.status(201).json(dbRating);
+});
+
+ListRouter.route('/user/:user_id').get(async (req, res, next) => {
+  let user_id = req.params.user_id;
+  const lists = await ListService.getAllUserLists(req.app.get('db'), user_id);
+  let result = lists.filter((list) => list.private === false);
+  res.status(200).json(result);
 });
 module.exports = ListRouter;
