@@ -117,7 +117,7 @@ ListRouter.route('/:id')
     if (!name) {
       return res.status(400).json('Missing name');
     }
-    if (!private) {
+    if (private === undefined) {
       return res.status(400).json('Missing private');
     }
     const patchItem = {

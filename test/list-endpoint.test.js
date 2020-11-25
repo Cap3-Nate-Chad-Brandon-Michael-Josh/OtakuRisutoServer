@@ -103,11 +103,29 @@ describe.only('list endpoint', () => {
     });
     afterEach('cleanup', () => helpers.cleanTables(db));
     describe('GET api/list/:id', () => {
-      it('should return 200 and a list object containing rating, comments, an array of list_anime objects, and an array of anime objects', () => {
+      it('should return 200 and a list object containing rating, comments, an array of list_anime objects, and an array of anime objects when given proper input', () => {
         return supertest(app)
           .get(`/api/list/${animeList.list_id}`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(helpers.makeExpectedList(animeList));
+      });
+    });
+    describe('PATCH ap/list/:id', () => {
+      it('should return 200 and a list object when given proper input', () => {
+        let body = {
+          name: 'changed',
+          private: false,
+        };
+        return supertest(app)
+          .patch(`/api/list/${animeList.list_id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
+          .send(body)
+          .expect({
+            list_id: animeList.list_id,
+            user_id: animeList.user_id,
+            name: body.name,
+            private: body.private,
+          });
       });
     });
   });
