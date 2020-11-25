@@ -28,7 +28,7 @@ ListRouter.route('/')
       return res.status(401).json('Invalid private');
     }
 
-    await ListService.addList(req.app.get('db'), listObj).then(async (res) => {
+    await ListService.addList(req.app.get('db'), listObj).then(async (result) => {
       //TO DO: clean this up, unnecessarrily hammering database.
       //where not in
       //where title not in (select title from anime)
@@ -51,12 +51,12 @@ ListRouter.route('/')
 
         let listAnime = {
           anime_id: dbAnime[0].anime_id,
-          list_id: res.list_id,
+          list_id: result.list_id,
         };
         await animeService.addListAnime(req.app.get('db'), listAnime);
       }
     });
-    return res.status(201).send(`List successfully added`);
+    return res.status(201).json({message: `List successfully added`});
   });
 
 ListRouter.route('/:id')
@@ -143,6 +143,7 @@ ListRouter.route('/:id')
     }
   });
 ListRouter.route('/comment').post(async (req, res, next) => {
+    console.log(req.body)
   let { comment, list_id } = req.body;
   if (!comment) {
     return res.status(400).json({ error: 'Missing comment' });
