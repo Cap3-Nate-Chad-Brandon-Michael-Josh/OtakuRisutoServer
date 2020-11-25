@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 const xss = require("xss");
 
 const animeService = {

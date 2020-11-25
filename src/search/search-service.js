@@ -1,12 +1,12 @@
 const searchService = {
   getUsers(db) {
-    return db("users").select("*");
+    return db('users').select('*');
   },
   getLists(db) {
-    return db("anime_list").select("*");
+    return db('anime_list').select('*');
   },
   getOwner(db, user_id) {
-    return db("users").select("*").where({ user_id }).first();
+    return db('users').select('*').where({ user_id }).first();
   },
   filterListsByName(lists, term) {
     let result = [];

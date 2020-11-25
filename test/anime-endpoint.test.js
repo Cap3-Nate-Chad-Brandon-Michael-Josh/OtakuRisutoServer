@@ -1,10 +1,10 @@
-const knex = require("knex");
-const supertest = require("supertest");
-const app = require("../src/app");
-const helpers = require("./test-helpers");
-const { expect } = require("chai");
+const knex = require('knex');
+const supertest = require('supertest');
+const app = require('../src/app');
+const helpers = require('./test-helpers');
+const { expect } = require('chai');
 
-describe("anime endpoint", () => {
+describe('anime endpoint', () => {
   let db;
   const testUsers = helpers.makeUsersArray();
   const testUser = testUsers[0];
@@ -15,34 +15,34 @@ describe("anime endpoint", () => {
   const listAnimeArr = helpers.makeListAnimeArray();
   const listAnime = listAnimeArr[0];
 
-  before("make knex instance", () => {
+  before('make knex instance', () => {
     db = knex({
-      client: "pg",
+      client: 'pg',
       connection: process.env.TEST_DATABASE_URL,
     });
-    app.set("db", db);
+    app.set('db', db);
   });
-  after("disconnect from db", () => db.destroy());
+  after('disconnect from db', () => db.destroy());
 
-  before("cleanup", () => helpers.cleanTables(db));
+  before('cleanup', () => helpers.cleanTables(db));
 
-  afterEach("cleanup", () => helpers.cleanTables(db));
+  afterEach('cleanup', () => helpers.cleanTables(db));
 
-  describe("POST /api/anime", () => {
-    beforeEach("insert users", () => {
+  describe('POST /api/anime', () => {
+    beforeEach('insert users', () => {
       return helpers.seedUsersTable(db, testUsers);
     });
 
-    beforeEach("insert anime", () => {
+    beforeEach('insert anime', () => {
       return helpers.seedAnimeTable(db, animeArr);
     });
-    beforeEach("insert anime-lists", () => {
+    beforeEach('insert anime-lists', () => {
       return helpers.seedAnimeListTable(db, animeListArr);
     });
-    it("responds with 201 and an anime object after adding it to the database as a list-anime", () => {
+    it('responds with 201 and an anime object after adding it to the database as a list-anime', () => {
       return supertest(app)
-        .post("/api/anime")
-        .set("Authorization", helpers.makeAuthHeader(testUser))
+        .post('/api/anime')
+        .set('Authorization', helpers.makeAuthHeader(testUser))
         .send({ anime, list_id: animeList.list_id })
         .expect(201, {
           anime: {
@@ -55,9 +55,9 @@ describe("anime endpoint", () => {
             genre: anime.genre,
           },
         })
-        .expect((res) =>
+        .expect(() =>
           db
-            .from("list_anime")
+            .from('list_anime')
             .where({ list_id: animeList.list_id })
             .then((res) => {
               expect(res[res.length - 1].anime_id).to.eql(anime.anime_id);
@@ -66,28 +66,28 @@ describe("anime endpoint", () => {
         );
     });
   });
-  describe("DELETE /api/anime", () => {
-    beforeEach("insert users", () => {
+  describe('DELETE /api/anime', () => {
+    beforeEach('insert users', () => {
       return helpers.seedUsersTable(db, testUsers);
     });
 
-    beforeEach("insert anime", () => {
+    beforeEach('insert anime', () => {
       return helpers.seedAnimeTable(db, animeArr);
     });
-    beforeEach("insert anime-lists", () => {
+    beforeEach('insert anime-lists', () => {
       return helpers.seedAnimeListTable(db, animeListArr);
     });
-    beforeEach("insert list_anime", () => {
+    beforeEach('insert list_anime', () => {
       return helpers.seedListAnimeTable(db, listAnimeArr);
     });
-    it("responds with 204 when list_anime is successfully deleted", () => {
+    it('responds with 204 when list_anime is successfully deleted', () => {
       return supertest(app)
-        .del("/api/anime")
-        .set("Authorization", helpers.makeAuthHeader(testUser))
+        .del('/api/anime')
+        .set('Authorization', helpers.makeAuthHeader(testUser))
         .send({ list_anime_id: listAnime.list_anime_id })
         .expect(204)
-        .expect((res) => {
-          db.from("list_anime")
+        .expect(() => {
+          db.from('list_anime')
             .where({ list_anime_id: listAnime.list_anime_id })
             .then((res) => {
               expect(res.length).to.eql(0);

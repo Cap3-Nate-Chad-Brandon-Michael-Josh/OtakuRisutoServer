@@ -1,64 +1,68 @@
-const express = require("express");
-const animeService = require("../anime/anime-service");
-const { requireAuth } = require("../middleware/JWT-auth");
-const ListService = require("./list-service");
+const express = require('express');
+const animeService = require('../anime/anime-service');
+const { requireAuth } = require('../middleware/JWT-auth');
+const ListService = require('./list-service');
 const jsonParser = express.json();
 
 const ListRouter = express.Router();
 ListRouter.use(requireAuth);
-ListRouter.route("/")
+ListRouter.use(jsonParser);
+ListRouter.route('/')
 
   .get(async (req, res, next) => {
-    const { user_id } = req.body;
+    let { user_id } = req.body;
     if (!user_id) {
       user_id = req.user.user_id;
     }
-    const lists = await ListService.getAllUserLists(req.app.get("db"), user_id);
+    const lists = await ListService.getAllUserLists(req.app.get('db'), user_id);
     res.status(200).json(lists);
   })
   .post(async (req, res, next) => {
-    const { anime, name, private } = req.body;
+    let { anime, name, private } = req.body;
+    if (!anime) {
+      anime = [];
+    }
     const user_id = req.user.user_id;
     const listObj = { user_id, name, private };
-    if (!name || typeof name !== "string") {
-      return res.status(400).json("Invalid name");
+    if (!name || typeof name !== 'string') {
+      return res.status(400).json('Invalid name');
     }
-    if (!private || typeof private !== "boolean") {
-      return res.status(400).json("Invalid private");
+    if (private === undefined || typeof private !== 'boolean') {
+      return res.status(401).json('Invalid private');
     }
 
-    await ListService.addList(req.app.get("db"), listObj).then(async (res) => {
+    await ListService.addList(req.app.get('db'), listObj).then(async (res) => {
       await anime.forEach(async (item) => {
         let exists = await animeService.hasAnimeWithTitle(
-          req.app.get("db"),
+          req.app.get('db'),
           item.title
         );
         if (!exists) {
           await animeService.addAnime(
-            req.app.get("db"),
+            req.app.get('db'),
             animeService.serializeAnime(item)
           );
         }
         let dbAnime = await animeService.getAnimeByTitle(
-          req.app.get("db"),
+          req.app.get('db'),
           item.title
         );
-
+        console.log('ANIIIIMEEEE ID', dbAnime[0].anime_id);
         let listAnime = {
-          list_id: res.list_id,
           anime_id: dbAnime[0].anime_id,
+          list_id: res.list_id,
         };
-        animeService.addListAnime(req.app.get("db"), listAnime);
+        await animeService.addListAnime(req.app.get('db'), listAnime);
       });
     });
     res.status(201).send(`List successfully added`);
   });
 
-ListRouter.route("/:id")
+ListRouter.route('/:id')
   .get(async (req, res, next) => {
     try {
       const list = await ListService.getListById(
-        req.app.get("db"),
+        req.app.get('db'),
         req.params.id
       );
       if (list.length === 0) {
@@ -67,7 +71,7 @@ ListRouter.route("/:id")
         });
       } else {
         let rating = await ListService.getListRating(
-          req.app.get("db"),
+          req.app.get('db'),
           req.params.id
         );
         if (!rating) {
@@ -75,21 +79,21 @@ ListRouter.route("/:id")
         }
         list[0].rating = rating;
         list[0].comments = await ListService.getListComments(
-          req.app.get("db"),
+          req.app.get('db'),
           req.params.id
         );
         for (let i = 0; i < list[0].comments.length; i++) {
           list[0].comments[i].username = await ListService.getCommentUsername(
-            req.app.get("db"),
+            req.app.get('db'),
             list[0].comments[i].comment_user_id
           );
         }
         list[0].list_anime = await ListService.getAnimeInList(
-          req.app.get("db"),
+          req.app.get('db'),
           req.params.id
         );
         list[0].anime = await ListService.getAllAnimeInfo(
-          req.app.get("db"),
+          req.app.get('db'),
           list[0].list_anime
         );
       }
@@ -110,10 +114,10 @@ ListRouter.route("/:id")
   .patch(jsonParser, (req, res, next) => {
     let { name, private } = req.body;
     if (!name) {
-      return res.status(400).json("Missing name");
+      return res.status(400).json('Missing name');
     }
     if (!private) {
-      return res.status(400).json("Missing private");
+      return res.status(400).json('Missing private');
     }
     const patchItem = {
       name,
@@ -121,7 +125,7 @@ ListRouter.route("/:id")
     };
     const user_id = req.user.user_id;
     const id = req.params.id;
-    ListService.updateUserList(req.app.get("db"), id, patchItem, user_id)
+    ListService.updateUserList(req.app.get('db'), id, patchItem, user_id)
       .then((item) => {
         res.status(200).json(item);
       })
@@ -131,42 +135,42 @@ ListRouter.route("/:id")
     const user_id = req.user.user_id;
     const { list_id } = req.body;
     if (!list_id) {
-      return res.status(400).json("Missing list_id");
+      return res.status(400).json('Missing list_id');
     }
     try {
-      await ListService.deleteList(req.app.get("db"), list_id, user_id);
+      await ListService.deleteList(req.app.get('db'), list_id, user_id);
       res.status(204).send(`List Deleted.`);
     } catch (error) {
       next(error);
     }
   });
-ListRouter.route("/comment").post(async (req, res, next) => {
+ListRouter.route('/comment').post(async (req, res, next) => {
   let { comment, list_id } = req.body;
   if (!comment) {
-    return res.status(400).json({ error: "Missing comment" });
+    return res.status(400).json({ error: 'Missing comment' });
   }
   if (!list_id) {
-    return res.status(400).json({ error: "Missing list_id" });
+    return res.status(400).json({ error: 'Missing list_id' });
   }
   let newComment = {
     comment_user_id: req.user.user_id,
     list_id,
     comment,
   };
-  let dbComment = await ListService.addComment(req.app.get("db"), newComment);
+  let dbComment = await ListService.addComment(req.app.get('db'), newComment);
   return res.status(201).json(dbComment);
 });
-ListRouter.route("/rating").post(async (req, res, next) => {
+ListRouter.route('/rating').post(async (req, res, next) => {
   let { rating, list_id } = req.body;
-  if (!rating || typeof rating !== "number" || rating > 5 || rating < 1) {
-    return res.status(400).json({ error: "Invalid rating" });
+  if (!rating || typeof rating !== 'number' || rating > 5 || rating < 1) {
+    return res.status(400).json({ error: 'Invalid rating' });
   }
   if (!list_id) {
-    return res.status(400).json({ error: "Missing list_id" });
+    return res.status(400).json({ error: 'Missing list_id' });
   }
   let alreadyRated = false;
   let usersWhoRated = await ListService.getUsersWhoRated(
-    req.app.get("db"),
+    req.app.get('db'),
     list_id
   );
   for (let i = 0; i < usersWhoRated.length; i++) {
@@ -176,7 +180,7 @@ ListRouter.route("/rating").post(async (req, res, next) => {
   }
   if (alreadyRated) {
     let dbRating = await ListService.updateRating(
-      req.app.get("db"),
+      req.app.get('db'),
       list_id,
       req.user.user_id,
       rating
@@ -188,7 +192,7 @@ ListRouter.route("/rating").post(async (req, res, next) => {
     rating,
     list_id,
   };
-  let dbRating = await ListService.addRating(req.app.get("db"), newRating);
+  let dbRating = await ListService.addRating(req.app.get('db'), newRating);
   res.status(201).json(dbRating);
 });
 module.exports = ListRouter;

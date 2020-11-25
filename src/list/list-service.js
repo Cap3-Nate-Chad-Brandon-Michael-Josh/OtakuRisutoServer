@@ -1,20 +1,18 @@
-const xss = require("xss");
-
 const ListService = {
   getAllUserLists(db, user_id) {
-    return db.from("anime_list").select("*").where("user_id", user_id);
+    return db.from('anime_list').select('*').where('user_id', user_id);
   },
 
   getListById(db, list_id) {
-    return db.from("anime_list").select("*").where("list_id", list_id);
+    return db.from('anime_list').select('*').where('list_id', list_id);
   },
 
   getAnimeInList(db, list_id) {
-    return db.from("list_anime").select("*").where("list_id", list_id);
+    return db.from('list_anime').select('*').where('list_id', list_id);
   },
 
   getAnimeInfo(db, anime_id) {
-    return db.from("anime").select("*").where("anime_id", anime_id);
+    return db.from('anime').select('*').where('anime_id', anime_id);
   },
 
   getAllAnimeInfo(db, arr) {
@@ -42,17 +40,17 @@ const ListService = {
   },
 
   addList(db, info) {
-    return db("anime_list")
+    return db('anime_list')
       .insert(info)
-      .returning("*")
+      .returning('*')
       .then((res) => res[0]);
   },
 
   deleteList(db, list_id, user_id) {
     return new Promise((resolve, reject) => {
       ListService.getListById(db, list_id).then((list) => {
-        if (user_id != list[0].user_id) {
-          reject(`Mismatching user_id`);
+        if (user_id !== list[0].user_id) {
+          reject('Mismatching user_id');
         } else {
           ListService.deleteAllListAnime(db, list_id).then(() => {
             ListService.deleteListAtId(db, list_id).then(() => {
@@ -71,18 +69,18 @@ const ListService = {
   },
 
   deleteListAtId(db, list_id) {
-    return db("anime_list").where("list_id", list_id).del();
+    return db('anime_list').where('list_id', list_id).del();
   },
 
   deleteAllListAnime(db, list_id) {
-    return db("list_anime").where("list_id", list_id).del();
+    return db('list_anime').where('list_id', list_id).del();
   },
 
   updateList(db, id, patchItem) {
-    return db("anime_list")
-      .where("list_id", id)
+    return db('anime_list')
+      .where('list_id', id)
       .update(patchItem)
-      .returning("*")
+      .returning('*')
       .then((item) => item[0]);
   },
 
@@ -94,7 +92,7 @@ const ListService = {
             resolve(item);
           });
         } else {
-          reject(`Mismatching user_id`);
+          reject('Mismatching user_id');
         }
       });
     })
@@ -104,8 +102,8 @@ const ListService = {
       .catch();
   },
   getListRating(db, list_id) {
-    return db("rating")
-      .select("rating")
+    return db('rating')
+      .select('rating')
       .where({ list_id })
       .then((res) => {
         return this.calculateListRating(res);
@@ -121,34 +119,34 @@ const ListService = {
     return result;
   },
   getCommentUsername(db, comment_user_id) {
-    return db("users")
-      .select("username")
+    return db('users')
+      .select('username')
       .where({ user_id: comment_user_id })
       .then(([{ username }]) => username);
   },
   getListComments(db, list_id) {
-    return db("comment").select("*").where({ list_id }).orderBy("comment_id");
+    return db('comment').select('*').where({ list_id }).orderBy('comment_id');
   },
   addComment(db, comment) {
-    return db("comment")
+    return db('comment')
       .insert(comment)
-      .returning("*")
+      .returning('*')
       .then(([comment]) => comment);
   },
   getUsersWhoRated(db, list_id) {
-    return db("rating").select("rating_user_id").where({ list_id });
+    return db('rating').select('rating_user_id').where({ list_id });
   },
   updateRating(db, list_id, rating_user_id, rating) {
-    return db("rating")
+    return db('rating')
       .where({ list_id, rating_user_id })
       .update({ rating })
-      .returning("*")
+      .returning('*')
       .then(([rating]) => rating);
   },
   addRating(db, rating) {
-    return db("rating")
+    return db('rating')
       .insert(rating)
-      .returning("*")
+      .returning('*')
       .then(([rating]) => rating);
   },
 };
