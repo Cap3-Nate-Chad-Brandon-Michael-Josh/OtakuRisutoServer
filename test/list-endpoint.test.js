@@ -15,6 +15,7 @@ describe.only('list endpoint', () => {
   const listAnimeArr = helpers.makeListAnimeArray();
   const listAnime = listAnimeArr[0];
   const ratingArr = helpers.makeRatingArray();
+  const commentArr = helpers.makeCommentArray();
 
   before('make knex instance', () => {
     db = knex({
@@ -101,6 +102,9 @@ describe.only('list endpoint', () => {
     beforeEach('insert ratings', () => {
       return helpers.seedRatingTable(db, ratingArr);
     });
+    beforeEach('insert comments', () => {
+      return helpers.seedCommentTable(db, commentArr);
+    });
     afterEach('cleanup', () => helpers.cleanTables(db));
     describe('GET api/list/:id', () => {
       it('should return 200 and a list object containing rating, comments, an array of list_anime objects, and an array of anime objects when given proper input', () => {
@@ -126,6 +130,162 @@ describe.only('list endpoint', () => {
             name: body.name,
             private: body.private,
           });
+      });
+    });
+    describe('DELETE api/list/:id', () => {
+      it('should respond 204 after deleting list from database', () => {
+        return supertest(app)
+          .del(`/api/list/${animeList.list_id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
+          .send({ list_id: animeList.list_id })
+          .expect(204)
+          .then(() => {
+            return db
+              .from('anime_list')
+              .select('*')
+              .where({ list_id: animeList.list_id })
+              .then((res) => expect(res.length).to.eql(0));
+          });
+      });
+    });
+  });
+  describe('/api/comment', () => {
+    beforeEach('insert users', () => {
+      return helpers.seedUsersTable(db, testUsers);
+    });
+
+    beforeEach('insert anime', () => {
+      return helpers.seedAnimeTable(db, animeArr);
+    });
+    beforeEach('insert anime-lists', () => {
+      return helpers.seedAnimeListTable(db, animeListArr);
+    });
+    beforeEach('insert list_anime', () => {
+      return helpers.seedListAnimeTable(db, listAnimeArr);
+    });
+    beforeEach('insert ratings', () => {
+      return helpers.seedRatingTable(db, ratingArr);
+    });
+    beforeEach('insert comments', () => {
+      return helpers.seedCommentTable(db, commentArr);
+    });
+    describe('POST /api/list/comment', () => {
+      it('should respond 201 and a new comment object after adding comment to database when valid data passed in', () => {
+        let newComment = {
+          comment: 'Im a test! Look at me!',
+          list_id: animeList.list_id,
+        };
+        return supertest(app)
+          .post('/api/list/comment')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(newComment)
+          .expect(201)
+          .expect((res) => {
+            expect(res.body).to.have.property('comment_id');
+            expect(res.body.comment).to.eql(newComment.comment);
+            expect(res.body.list_id).to.eql(newComment.list_id);
+            expect(res.body.comment_user_id).to.eql(testUser.user_id);
+          })
+          .expect(() => {
+            db.from('comment')
+              .select('*')
+              .where({
+                comment_user_id: testUser.user_id,
+                list_id: newComment.list_id,
+              })
+              .then((res) => {
+                expect(res[0]).to.have.property('comment_id');
+                expect(res[0].comment).to.eql(newComment.comment);
+                expect(res[0].list_id).to.eql(newComment.list_id);
+                expect(res[0].comment_user_id).to.eql(testUser.user_id);
+              });
+          });
+      });
+    });
+  });
+  describe('/api/list/rating', () => {
+    beforeEach('insert users', () => {
+      return helpers.seedUsersTable(db, testUsers);
+    });
+
+    beforeEach('insert anime', () => {
+      return helpers.seedAnimeTable(db, animeArr);
+    });
+    beforeEach('insert anime-lists', () => {
+      return helpers.seedAnimeListTable(db, animeListArr);
+    });
+    beforeEach('insert list_anime', () => {
+      return helpers.seedListAnimeTable(db, listAnimeArr);
+    });
+    beforeEach('insert ratings', () => {
+      return helpers.seedRatingTable(db, ratingArr);
+    });
+    beforeEach('insert comments', () => {
+      return helpers.seedCommentTable(db, commentArr);
+    });
+    describe('POST /api/list/rating', () => {
+      it('should respond with 201 and a new rating object from database after being given valid data', () => {
+        let newRating = {
+          rating: 4,
+          list_id: animeList.list_id,
+        };
+        return supertest(app)
+          .post('/api/list/rating')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(newRating)
+          .expect(201)
+          .expect((res) => {
+            expect(res.body).to.have.property('rating_id');
+            expect(res.body.rating).to.eql(newRating.rating);
+            expect(res.body.list_id).to.eql(newRating.list_id);
+            expect(res.body.rating_user_id).to.eql(testUser.user_id);
+          })
+          .expect(() => {
+            db.from('rating')
+              .select('*')
+              .where({
+                rating_user_id: testUser.user_id,
+                list_id: newRating.list_id,
+              })
+              .then((res) => {
+                expect(res[0]).to.have.property('rating_id');
+                expect(res[0].rating).to.eql(newRating.rating);
+                expect(res[0].list_id).to.eql(newRating.list_id);
+                expect(res[0].rating_user_id).to.eql(testUser.user_id);
+              });
+          });
+      });
+    });
+  });
+  describe('/api/list/user/user:id', () => {
+    beforeEach('insert users', () => {
+      return helpers.seedUsersTable(db, testUsers);
+    });
+
+    beforeEach('insert anime', () => {
+      return helpers.seedAnimeTable(db, animeArr);
+    });
+    beforeEach('insert anime-lists', () => {
+      return helpers.seedAnimeListTable(db, animeListArr);
+    });
+    beforeEach('insert list_anime', () => {
+      return helpers.seedListAnimeTable(db, listAnimeArr);
+    });
+    beforeEach('insert ratings', () => {
+      return helpers.seedRatingTable(db, ratingArr);
+    });
+    beforeEach('insert comments', () => {
+      return helpers.seedCommentTable(db, commentArr);
+    });
+    describe('GET /api/list/user/user:id', () => {
+      it('should respond with 200 and an array of list objects when given proper data', () => {
+        let expectedPublicListArr = helpers
+          .makeExpectedListArr()
+          .filter((item) => item.private === false);
+        return supertest(app)
+          .get(`/api/list/user/${testUser.user_id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(expectedPublicListArr);
       });
     });
   });
