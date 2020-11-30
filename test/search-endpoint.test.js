@@ -28,6 +28,12 @@ describe('search endpoint', () => {
     beforeEach('insert users', () => {
       return helpers.seedUsersTable(db, testUsers);
     });
+    it('should return 400 and an error when nothing is found matching the term', () => {
+      return supertest(app)
+        .get('/api/search/users/foobarshouldntbehere')
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .expect(400, { error: 'Nothing found matching search criteria' });
+    });
     it('should return 200 and an array of users whose name include the search term', () => {
       return supertest(app)
         .get(`/api/search/users/${testUser.username}`)
@@ -41,6 +47,12 @@ describe('search endpoint', () => {
     });
     beforeEach('insert anime_list', () => {
       return helpers.seedAnimeListTable(db, animeListArr);
+    });
+    it('should return 400 and an error when nothing is found matching the term', () => {
+      return supertest(app)
+        .get('/api/search/lists/foobarshouldntbehere')
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .expect(400, { error: 'Nothing found matching search criteria' });
     });
     it('should return 200 and an array of lists whose name includes the search term', () => {
       return supertest(app)
