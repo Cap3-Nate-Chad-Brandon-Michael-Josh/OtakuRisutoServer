@@ -11,9 +11,7 @@ describe('list endpoint', () => {
   const animeArr = helpers.makeAnimeArray();
   const animeListArr = helpers.makeAnimeListArray();
   const animeList = animeListArr[8];
-  const anime = animeArr[0];
   const listAnimeArr = helpers.makeListAnimeArray();
-  const listAnime = listAnimeArr[0];
   const ratingArr = helpers.makeRatingArray();
   const commentArr = helpers.makeCommentArray();
 
@@ -138,9 +136,9 @@ describe('list endpoint', () => {
     describe('GET api/list/:id', () => {
       it('should return 400 and an error when no list found at id', () => {
         return supertest(app)
-          .get(`/api/list/9000000`)
+          .get('/api/list/9000000')
           .set('Authorization', helpers.makeAuthHeader(testUser))
-          .expect(400, { error: `List at given id not found` });
+          .expect(400, { error: 'List at given id not found' });
       });
       it('should return 200 and a list object containing rating, comments, an array of list_anime objects, and an array of anime objects when given proper input', () => {
         return supertest(app)
