@@ -54,6 +54,35 @@ describe('list endpoint', () => {
       });
     });
     describe('POST /api/list', () => {
+      const requiredFields = ['name', 'private'];
+      requiredFields.forEach((field) => {
+        const validList = {
+          name: 'testy',
+          private: false,
+        };
+        it(`Responds 400 when missing ${field}`, () => {
+          delete validList[field];
+          return supertest(app)
+            .post('/api/list')
+            .set('Authorization', helpers.makeAuthHeader(testUser))
+            .send(validList)
+            .expect(400, { error: `Invalid ${field}` });
+        });
+      });
+      it('should respond 400 when invalid name', () => {
+        return supertest(app)
+          .post('/api/list')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send({ name: 3, private: true })
+          .expect(400, { error: 'Invalid name' });
+      });
+      it('should respond 400 when invalid private', () => {
+        return supertest(app)
+          .post('/api/list')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send({ name: 'testy', private: 'wrong' })
+          .expect(400, { error: 'Invalid private' });
+      });
       it('should respond with 201 after list has been added to database', () => {
         let body = {
           anime: helpers.makeNewAnimeArr(),
@@ -107,6 +136,12 @@ describe('list endpoint', () => {
     });
     afterEach('cleanup', () => helpers.cleanTables(db));
     describe('GET api/list/:id', () => {
+      it('should return 400 and an error when no list found at id', () => {
+        return supertest(app)
+          .get(`/api/list/9000000`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(400, { error: `List at given id not found` });
+      });
       it('should return 200 and a list object containing rating, comments, an array of list_anime objects, and an array of anime objects when given proper input', () => {
         return supertest(app)
           .get(`/api/list/${animeList.list_id}`)
@@ -115,6 +150,35 @@ describe('list endpoint', () => {
       });
     });
     describe('PATCH ap/list/:id', () => {
+      const requiredFields = ['name', 'private'];
+      requiredFields.forEach((field) => {
+        const validList = {
+          name: 'testy',
+          private: false,
+        };
+        it(`Responds 400 when missing ${field}`, () => {
+          delete validList[field];
+          return supertest(app)
+            .patch(`/api/list/${animeList.list_id}`)
+            .set('Authorization', helpers.makeAuthHeader(testUser))
+            .send(validList)
+            .expect(400, { error: `Invalid ${field}` });
+        });
+      });
+      it('should respond 400 when invalid name', () => {
+        return supertest(app)
+          .patch(`/api/list/${animeList.list_id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send({ name: 3, private: true })
+          .expect(400, { error: 'Invalid name' });
+      });
+      it('should respond 400 when invalid private', () => {
+        return supertest(app)
+          .patch(`/api/list/${animeList.list_id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send({ name: 'testy', private: 'wrong' })
+          .expect(400, { error: 'Invalid private' });
+      });
       it('should return 200 and a list object when given proper input', () => {
         let body = {
           name: 'changed',
@@ -133,6 +197,13 @@ describe('list endpoint', () => {
       });
     });
     describe('DELETE api/list/:id', () => {
+      it('should respond 400 if missing list_id', () => {
+        return supertest(app)
+          .del(`/api/list/${animeList.list_id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
+          .send({ foo: 'bar' })
+          .expect(400, { error: 'Missing list_id' });
+      });
       it('should respond 204 after deleting list from database', () => {
         return supertest(app)
           .del(`/api/list/${animeList.list_id}`)
@@ -170,6 +241,35 @@ describe('list endpoint', () => {
       return helpers.seedCommentTable(db, commentArr);
     });
     describe('POST /api/list/comment', () => {
+      const requiredFields = ['comment', 'list_id'];
+      requiredFields.forEach((field) => {
+        const validComment = {
+          comment: 'testy',
+          list_id: 3,
+        };
+        it(`Responds 400 when missing ${field}`, () => {
+          delete validComment[field];
+          return supertest(app)
+            .post('/api/list/comment')
+            .set('Authorization', helpers.makeAuthHeader(testUser))
+            .send(validComment)
+            .expect(400, { error: `Invalid ${field}` });
+        });
+      });
+      it('should respond 400 when invalid comment', () => {
+        return supertest(app)
+          .post('/api/list/comment')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send({ comment: 3, list_id: true })
+          .expect(400, { error: 'Invalid comment' });
+      });
+      it('should respond 400 when invalid list_id', () => {
+        return supertest(app)
+          .post('/api/list/comment')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send({ comment: 'testy', list_id: 'wrong' })
+          .expect(400, { error: 'Invalid list_id' });
+      });
       it('should respond 201 and a new comment object after adding comment to database when valid data passed in', () => {
         let newComment = {
           comment: 'Im a test! Look at me!',
@@ -224,6 +324,49 @@ describe('list endpoint', () => {
       return helpers.seedCommentTable(db, commentArr);
     });
     describe('POST /api/list/rating', () => {
+      const requiredFields = ['rating', 'list_id'];
+      requiredFields.forEach((field) => {
+        const validRating = {
+          rating: 5,
+          list_id: 3,
+        };
+        it(`Responds 400 when missing ${field}`, () => {
+          delete validRating[field];
+          return supertest(app)
+            .post('/api/list/rating')
+            .set('Authorization', helpers.makeAuthHeader(testUser))
+            .send(validRating)
+            .expect(400, { error: `Invalid ${field}` });
+        });
+      });
+      it('should respond with 400 when rating is > 5', () => {
+        return supertest(app)
+          .post('/api/list/rating')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send({ rating: 90000, list_id: 3 })
+          .expect(400, { error: 'Invalid rating' });
+      });
+      it('should respond with 400 when rating is < 1', () => {
+        return supertest(app)
+          .post('/api/list/rating')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send({ rating: 0, list_id: 3 })
+          .expect(400, { error: 'Invalid rating' });
+      });
+      it('should respond with 400 when rating is not a number', () => {
+        return supertest(app)
+          .post('/api/list/rating')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send({ rating: true, list_id: 3 })
+          .expect(400, { error: 'Invalid rating' });
+      });
+      it('should respond with 400 when list_id is not a number', () => {
+        return supertest(app)
+          .post('/api/list/rating')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send({ rating: 3, list_id: true })
+          .expect(400, { error: 'Invalid list_id' });
+      });
       it('should respond with 201 and a new rating object from database after being given valid data', () => {
         let newRating = {
           rating: 4,

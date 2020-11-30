@@ -22,10 +22,10 @@ ListRouter.route('/')
     const user_id = req.user.user_id;
     const listObj = { user_id, name, private };
     if (!name || typeof name !== 'string') {
-      return res.status(400).json('Invalid name');
+      return res.status(400).json({ error: 'Invalid name' });
     }
     if (private === undefined || typeof private !== 'boolean') {
-      return res.status(401).json('Invalid private');
+      return res.status(400).json({ error: 'Invalid private' });
     }
 
     await ListService.addList(req.app.get('db'), listObj).then(
@@ -100,11 +100,6 @@ ListRouter.route('/:id')
           list[0].list_anime
         );
       }
-      if (list.length === 0) {
-        return res.status(400).json({
-          error: `Please send a proper list id`,
-        });
-      }
 
       return res.status(200).json(list[0]);
     } catch (error) {
@@ -113,11 +108,11 @@ ListRouter.route('/:id')
   })
   .patch(jsonParser, (req, res, next) => {
     let { name, private } = req.body;
-    if (!name) {
-      return res.status(400).json('Missing name');
+    if (!name || typeof name !== 'string') {
+      return res.status(400).json({ error: 'Invalid name' });
     }
-    if (private === undefined) {
-      return res.status(400).json('Missing private');
+    if (private === undefined || typeof private !== 'boolean') {
+      return res.status(400).json({ error: 'Invalid private' });
     }
     const patchItem = {
       name,
@@ -135,7 +130,7 @@ ListRouter.route('/:id')
     const user_id = req.user.user_id;
     const { list_id } = req.body;
     if (!list_id) {
-      return res.status(400).json('Missing list_id');
+      return res.status(400).json({ error: 'Missing list_id' });
     }
     try {
       await ListService.deleteList(req.app.get('db'), list_id, user_id);
@@ -146,11 +141,11 @@ ListRouter.route('/:id')
   });
 ListRouter.route('/comment').post(async (req, res, next) => {
   let { comment, list_id } = req.body;
-  if (!comment) {
-    return res.status(400).json({ error: 'Missing comment' });
+  if (!comment || typeof comment !== 'string') {
+    return res.status(400).json({ error: 'Invalid comment' });
   }
-  if (!list_id) {
-    return res.status(400).json({ error: 'Missing list_id' });
+  if (!list_id || typeof list_id !== 'number') {
+    return res.status(400).json({ error: 'Invalid list_id' });
   }
   let newComment = {
     comment_user_id: req.user.user_id,
@@ -165,8 +160,8 @@ ListRouter.route('/rating').post(async (req, res, next) => {
   if (!rating || typeof rating !== 'number' || rating > 5 || rating < 1) {
     return res.status(400).json({ error: 'Invalid rating' });
   }
-  if (!list_id) {
-    return res.status(400).json({ error: 'Missing list_id' });
+  if (!list_id || typeof list_id !== 'number') {
+    return res.status(400).json({ error: 'Invalid list_id' });
   }
   let alreadyRated = false;
   let usersWhoRated = await ListService.getUsersWhoRated(
