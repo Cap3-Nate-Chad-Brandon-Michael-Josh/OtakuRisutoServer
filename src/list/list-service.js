@@ -12,7 +12,6 @@ const ListService = {
   },
 
   getAnimeInfo(db, anime_id) {
-    console.log('called');
     return db.from('anime').select('*').where('anime_id', anime_id);
   },
 

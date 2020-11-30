@@ -28,35 +28,37 @@ ListRouter.route('/')
       return res.status(401).json('Invalid private');
     }
 
-    await ListService.addList(req.app.get('db'), listObj).then(async (result) => {
-      //TO DO: clean this up, unnecessarrily hammering database.
-      //where not in
-      //where title not in (select title from anime)
+    await ListService.addList(req.app.get('db'), listObj).then(
+      async (result) => {
+        //TO DO: clean this up, unnecessarrily hammering database.
+        //where not in
+        //where title not in (select title from anime)
 
-      for (let item of anime) {
-        let exists = await animeService.hasAnimeWithTitle(
-          req.app.get('db'),
-          item.title
-        );
-        if (!exists) {
-          await animeService.addAnime(
+        for (let item of anime) {
+          let exists = await animeService.hasAnimeWithTitle(
             req.app.get('db'),
-            animeService.serializeAnime(item)
+            item.title
           );
-        }
-        let dbAnime = await animeService.getAnimeByTitle(
-          req.app.get('db'),
-          item.title
-        );
+          if (!exists) {
+            await animeService.addAnime(
+              req.app.get('db'),
+              animeService.serializeAnime(item)
+            );
+          }
+          let dbAnime = await animeService.getAnimeByTitle(
+            req.app.get('db'),
+            item.title
+          );
 
-        let listAnime = {
-          anime_id: dbAnime[0].anime_id,
-          list_id: result.list_id,
-        };
-        await animeService.addListAnime(req.app.get('db'), listAnime);
+          let listAnime = {
+            anime_id: dbAnime[0].anime_id,
+            list_id: result.list_id,
+          };
+          await animeService.addListAnime(req.app.get('db'), listAnime);
+        }
       }
-    });
-    return res.status(201).json({message: `List successfully added`});
+    );
+    return res.status(201).json({ message: `List successfully added` });
   });
 
 ListRouter.route('/:id')
@@ -143,7 +145,6 @@ ListRouter.route('/:id')
     }
   });
 ListRouter.route('/comment').post(async (req, res, next) => {
-    console.log(req.body)
   let { comment, list_id } = req.body;
   if (!comment) {
     return res.status(400).json({ error: 'Missing comment' });
