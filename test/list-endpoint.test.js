@@ -154,7 +154,7 @@ describe('list endpoint', () => {
           .expect(helpers.makeExpectedList(animeList));
       });
     });
-    describe('PATCH ap/list/:id', () => {
+    describe('PATCH api/list/:id', () => {
       const requiredFields = ['name', 'private'];
       requiredFields.forEach((field) => {
         const validList = {
@@ -198,6 +198,7 @@ describe('list endpoint', () => {
             user_id: animeList.user_id,
             name: body.name,
             private: body.private,
+            rating: helpers.calculateListRating(animeList),
           });
       });
     });

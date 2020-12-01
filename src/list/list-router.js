@@ -116,7 +116,7 @@ ListRouter.route('/:id')
       next(error);
     }
   })
-  .patch(jsonParser, (req, res, next) => {
+  .patch(jsonParser, async (req, res, next) => {
     let { name, private } = req.body;
     if (!name || typeof name !== 'string') {
       return res.status(400).json({ error: 'Invalid name' });
@@ -130,11 +130,21 @@ ListRouter.route('/:id')
     };
     const user_id = req.user.user_id;
     const id = req.params.id;
-    ListService.updateUserList(req.app.get('db'), id, patchItem, user_id)
-      .then((item) => {
-        res.status(200).json(item);
-      })
-      .catch(next);
+    let item = await ListService.updateUserList(
+      req.app.get('db'),
+      id,
+      patchItem,
+      user_id
+    );
+    let rating = await ListService.getListRating(
+      req.app.get('db'),
+      item.list_id
+    );
+    if (!rating) {
+      rating = 0;
+    }
+    item.rating = rating;
+    res.json(item);
   })
   .delete(async (req, res, next) => {
     const user_id = req.user.user_id;
