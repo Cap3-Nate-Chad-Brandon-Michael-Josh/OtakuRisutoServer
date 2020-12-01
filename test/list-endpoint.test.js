@@ -3,7 +3,6 @@ const supertest = require('supertest');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 const { expect } = require('chai');
-const { format } = require('morgan');
 
 describe('list endpoint', () => {
   let db;
@@ -45,13 +44,17 @@ describe('list endpoint', () => {
     });
     afterEach('cleanup', () => helpers.cleanTables(db));
     describe('GET /api/list', () => {
-      let expectedListArr = helpers.makeExpectedListArr();
-      for (let i = 0; i < expectedListArr.length; i++) {
-        expectedListArr[i].rating = helpers.calculateListRating(
-          expectedListArr[i]
-        );
-      }
       it('should respond with 200 and an array of list objects when given proper data', () => {
+        let expectedListArr = helpers.makeExpectedListArr();
+        for (let i = 0; i < expectedListArr.length; i++) {
+          expectedListArr[i].rating = helpers.calculateListRating(
+            expectedListArr[i]
+          );
+          expectedListArr[i].user_rating = helpers.makeExpectedUserRating(
+            expectedListArr[i],
+            testUser
+          );
+        }
         return supertest(app)
           .get('/api/list')
           .set('Authorization', helpers.makeAuthHeader(testUser))
@@ -151,7 +154,7 @@ describe('list endpoint', () => {
         return supertest(app)
           .get(`/api/list/${animeList.list_id}`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
-          .expect(helpers.makeExpectedList(animeList));
+          .expect(helpers.makeExpectedList(animeList, testUser));
       });
     });
     describe('PATCH api/list/:id', () => {
@@ -199,6 +202,10 @@ describe('list endpoint', () => {
             name: body.name,
             private: body.private,
             rating: helpers.calculateListRating(animeList),
+            user_rating: helpers.makeExpectedUserRating(
+              animeList,
+              testUsers[2]
+            ),
           });
       });
     });
@@ -434,6 +441,10 @@ describe('list endpoint', () => {
         for (let i = 0; i < expectedPublicListArr.length; i++) {
           expectedPublicListArr[i].rating = helpers.calculateListRating(
             expectedPublicListArr[i]
+          );
+          expectedPublicListArr[i].user_rating = helpers.makeExpectedUserRating(
+            expectedPublicListArr[i],
+            testUser
           );
         }
         return supertest(app)

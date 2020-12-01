@@ -10,6 +10,7 @@ describe('search endpoint', () => {
   const animeListArr = helpers.makeAnimeListArray();
   const animeList = animeListArr[8];
   const owner = testUsers[2];
+  const ratingsArr = helpers.makeRatingArray();
 
   before('make knex instance', () => {
     db = knex({
@@ -47,6 +48,9 @@ describe('search endpoint', () => {
     beforeEach('insert anime_list', () => {
       return helpers.seedAnimeListTable(db, animeListArr);
     });
+    beforeEach('insert anime_list', () => {
+      return helpers.seedRatingTable(db, ratingsArr);
+    });
     it('should return 400 and an error when nothing is found matching the term', () => {
       return supertest(app)
         .get('/api/search/lists/foobarshouldntbehere')
@@ -62,7 +66,8 @@ describe('search endpoint', () => {
             list_id: animeList.list_id,
             name: animeList.name,
             owner: { username: owner.username, user_id: owner.user_id },
-            rating: helpers.calculateListRating(animeList.list_id),
+            rating: helpers.calculateListRating(animeList),
+            user_rating: helpers.makeExpectedUserRating(animeList, testUser),
           },
         ]);
     });

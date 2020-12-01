@@ -138,6 +138,12 @@ const ListService = {
       .returning('*')
       .then(([rating]) => rating);
   },
+  getUserRating(db, rating_user_id, list_id) {
+    return db('rating')
+      .select('rating')
+      .where({ rating_user_id, list_id })
+      .then(([rating]) => rating);
+  },
 };
 
 module.exports = ListService;

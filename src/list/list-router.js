@@ -21,6 +21,16 @@ ListRouter.route('/')
         rating = 0;
       }
       lists[i].rating = rating;
+      let userRating = await ListService.getUserRating(
+        req.app.get('db'),
+        req.user.user_id,
+        lists[i].list_id
+      );
+      if (!userRating || !userRating.rating) {
+        userRating = {};
+        userRating.rating = 'Unrated';
+      }
+      lists[i].user_rating = userRating.rating;
     }
     res.status(200).json(lists);
   })
@@ -91,6 +101,16 @@ ListRouter.route('/:id')
           rating = 0;
         }
         list[0].rating = rating;
+        let userRating = await ListService.getUserRating(
+          req.app.get('db'),
+          req.user.user_id,
+          list[0].list_id
+        );
+        if (!userRating || !userRating.rating) {
+          userRating = {};
+          userRating.rating = 'Unrated';
+        }
+        list[0].user_rating = userRating.rating;
         list[0].comments = await ListService.getListComments(
           req.app.get('db'),
           req.params.id
@@ -144,6 +164,16 @@ ListRouter.route('/:id')
       rating = 0;
     }
     item.rating = rating;
+    let userRating = await ListService.getUserRating(
+      req.app.get('db'),
+      req.user.user_id,
+      item.list_id
+    );
+    if (!userRating || !userRating.rating) {
+      userRating = {};
+      userRating.rating = 'Unrated';
+    }
+    item.user_rating = userRating.rating;
     res.json(item);
   })
   .delete(async (req, res, next) => {
@@ -224,6 +254,16 @@ ListRouter.route('/user/:user_id').get(async (req, res, next) => {
       rating = 0;
     }
     result[i].rating = rating;
+    let userRating = await ListService.getUserRating(
+      req.app.get('db'),
+      req.user.user_id,
+      result[i].list_id
+    );
+    if (!userRating || !userRating.rating) {
+      userRating = {};
+      userRating.rating = 'Unrated';
+    }
+    result[i].user_rating = userRating.rating;
   }
   res.status(200).json(result);
 });

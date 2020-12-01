@@ -48,6 +48,12 @@ const searchService = {
     let result = parseFloat((sum / ratingArr.length).toFixed(2));
     return result;
   },
+  getUserRating(db, rating_user_id, list_id) {
+    return db('rating')
+      .select('rating')
+      .where({ rating_user_id, list_id })
+      .then(([rating]) => rating);
+  },
 };
 
 module.exports = searchService;

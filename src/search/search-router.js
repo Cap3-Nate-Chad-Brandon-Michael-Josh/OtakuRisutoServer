@@ -34,6 +34,15 @@ searchRouter.get('/lists/:term', async (req, res, next) => {
       if (!rating) {
         rating = 0;
       }
+      let userRating = await searchService.getUserRating(
+        req.app.get('db'),
+        req.user.user_id,
+        filteredList[i].list_id
+      );
+      if (!userRating || !userRating.rating) {
+        userRating = {};
+        userRating.rating = 'Unrated';
+      }
       result.push({
         list_id: filteredList[i].list_id,
         name: filteredList[i].name,
@@ -42,6 +51,7 @@ searchRouter.get('/lists/:term', async (req, res, next) => {
           user_id: dbOwner.user_id,
         },
         rating: rating,
+        user_rating: userRating.rating,
       });
     }
   }

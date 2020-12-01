@@ -434,7 +434,18 @@ function calculateListRating(list) {
   let result = parseFloat((sum / ratings.length).toFixed(2));
   return result;
 }
-
+function makeExpectedUserRating(list, user) {
+  let userRating = makeRatingArray().find(
+    (rating) =>
+      rating.list_id === list.list_id && rating.rating_user_id === user.user_id
+  );
+  if (!userRating || !userRating.rating) {
+    userRating = {
+      rating: 'Unrated',
+    };
+  }
+  return userRating.rating;
+}
 function makeExpectedAnimeArr(listAnimeArr) {
   let result = [];
   let anime = makeAnimeArray();
@@ -445,7 +456,7 @@ function makeExpectedAnimeArr(listAnimeArr) {
   }
   return result;
 }
-function makeExpectedList(list) {
+function makeExpectedList(list, user) {
   let comments = makeCommentArray().filter(
     (comment) => comment.list_id === list.list_id
   );
@@ -459,6 +470,7 @@ function makeExpectedList(list) {
     name: list.name,
     private: list.private,
     rating: calculateListRating(list),
+    user_rating: makeExpectedUserRating(list, user),
     comments: comments,
     list_anime: listAnime,
     anime: anime,
@@ -484,4 +496,5 @@ module.exports = {
   makeExpectedListAnimeArr,
   makeExpectedList,
   calculateListRating,
+  makeExpectedUserRating,
 };
