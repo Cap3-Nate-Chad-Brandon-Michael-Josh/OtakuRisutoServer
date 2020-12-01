@@ -62,6 +62,7 @@ describe('search endpoint', () => {
             list_id: animeList.list_id,
             name: animeList.name,
             owner: { username: owner.username, user_id: owner.user_id },
+            rating: helpers.calculateListRating(animeList.list_id),
           },
         ]);
     });

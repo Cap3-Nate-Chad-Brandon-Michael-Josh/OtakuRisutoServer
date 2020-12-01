@@ -3,6 +3,7 @@ const supertest = require('supertest');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 const { expect } = require('chai');
+const { format } = require('morgan');
 
 describe('list endpoint', () => {
   let db;
@@ -44,11 +45,17 @@ describe('list endpoint', () => {
     });
     afterEach('cleanup', () => helpers.cleanTables(db));
     describe('GET /api/list', () => {
+      let expectedListArr = helpers.makeExpectedListArr();
+      for (let i = 0; i < expectedListArr.length; i++) {
+        expectedListArr[i].rating = helpers.calculateListRating(
+          expectedListArr[i]
+        );
+      }
       it('should respond with 200 and an array of list objects when given proper data', () => {
         return supertest(app)
           .get('/api/list')
           .set('Authorization', helpers.makeAuthHeader(testUser))
-          .expect(helpers.makeExpectedListArr());
+          .expect(expectedListArr);
       });
     });
     describe('POST /api/list', () => {
@@ -423,6 +430,11 @@ describe('list endpoint', () => {
         let expectedPublicListArr = helpers
           .makeExpectedListArr()
           .filter((item) => item.private === false);
+        for (let i = 0; i < expectedPublicListArr.length; i++) {
+          expectedPublicListArr[i].rating = helpers.calculateListRating(
+            expectedPublicListArr[i]
+          );
+        }
         return supertest(app)
           .get(`/api/list/user/${testUser.user_id}`)
           .set('Authorization', helpers.makeAuthHeader(testUser))

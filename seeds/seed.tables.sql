@@ -19,7 +19,8 @@ VALUES
 (1, 1, 'seen', true),
 (2, 1, 'must watch', true),
 (3, 2, 'seen', true),
-(4, 2, 'must watch', true);
+(4, 2, 'must watch', true),
+(5, 1, 'testing public', false);
 
 INSERT INTO anime(anime_id, title, description, image_url, rating, episode_count, genre)
 VALUES
@@ -45,17 +46,17 @@ VALUES
 
 INSERT INTO comment(comment_id, comment_user_id, list_id, comment)
 VALUES 
-(1, 1, 1, 'FIRST!!'),
-(2, 2, 1, 'Aww I wanted to be first'),
-(3, 3, 1, 'SECOND!!'),
-(4, 2, 1, 'no your not! I was!'),
+(1, 1, 5, 'FIRST!!'),
+(2, 2, 5, 'Aww I wanted to be first'),
+(3, 3, 5, 'SECOND!!'),
+(4, 2, 5, 'no your not! I was!'),
 (5, 1, 2, 'FIRST!!');
 
 
 INSERT INTO rating(rating_id, rating_user_id, list_id, rating)
 VALUES
-(1, 1, 1, 5),
-(2, 2, 1, 1),
+(1, 1, 5, 5),
+(2, 2, 5, 1),
 (3, 1, 2, 3);
 SELECT setval('users_user_id_seq', (SELECT MAX(user_id) from users));
 SELECT setval('anime_list_list_id_seq', (SELECT MAX(list_id) from anime_list));

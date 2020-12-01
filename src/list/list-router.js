@@ -12,6 +12,16 @@ ListRouter.route('/')
   .get(async (req, res, next) => {
     let user_id = req.user.user_id;
     const lists = await ListService.getAllUserLists(req.app.get('db'), user_id);
+    for (let i = 0; i < lists.length; i++) {
+      let rating = await ListService.getListRating(
+        req.app.get('db'),
+        lists[i].list_id
+      );
+      if (!rating) {
+        rating = 0;
+      }
+      lists[i].rating = rating;
+    }
     res.status(200).json(lists);
   })
   .post(async (req, res, next) => {
@@ -195,6 +205,16 @@ ListRouter.route('/user/:user_id').get(async (req, res, next) => {
   let user_id = req.params.user_id;
   const lists = await ListService.getAllUserLists(req.app.get('db'), user_id);
   let result = lists.filter((list) => list.private === false);
+  for (let i = 0; i < result.length; i++) {
+    let rating = await ListService.getListRating(
+      req.app.get('db'),
+      result[i].list_id
+    );
+    if (!rating) {
+      rating = 0;
+    }
+    result[i].rating = rating;
+  }
   res.status(200).json(result);
 });
 module.exports = ListRouter;

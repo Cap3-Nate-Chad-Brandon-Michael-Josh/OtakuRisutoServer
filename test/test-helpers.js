@@ -428,6 +428,9 @@ function calculateListRating(list) {
   for (let i = 0; i < ratings.length; i++) {
     sum = sum + ratings[i].rating;
   }
+  if (sum === 0) {
+    return sum;
+  }
   let result = parseFloat((sum / ratings.length).toFixed(2));
   return result;
 }
@@ -480,4 +483,5 @@ module.exports = {
   makeNewAnimeArr,
   makeExpectedListAnimeArr,
   makeExpectedList,
+  calculateListRating,
 };

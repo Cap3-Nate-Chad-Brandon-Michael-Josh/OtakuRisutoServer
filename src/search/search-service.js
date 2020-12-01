@@ -31,6 +31,23 @@ const searchService = {
     }
     return result;
   },
+  getListRating(db, list_id) {
+    return db('rating')
+      .select('rating')
+      .where({ list_id })
+      .then((res) => {
+        return this.calculateListRating(res);
+      });
+  },
+  calculateListRating(ratingArr) {
+    let sum = 0;
+
+    for (let i = 0; i < ratingArr.length; i++) {
+      sum = sum + ratingArr[i].rating;
+    }
+    let result = parseFloat((sum / ratingArr.length).toFixed(2));
+    return result;
+  },
 };
 
 module.exports = searchService;
