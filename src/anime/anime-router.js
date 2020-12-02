@@ -27,6 +27,12 @@ animeRouter.post('/', async (req, res, next) => {
       req.app.get('db'),
       animeService.serializeAnime(anime)
     );
+  } else {
+    let dbAnime = await animeService.getAnimeByTitle(
+      req.app.get('db'),
+      anime.title
+    );
+    animeService.updateAnime(req.app.get('db'), anime, dbAnime.anime_id);
   }
   let dbAnime = await animeService.getAnimeByTitle(
     req.app.get('db'),

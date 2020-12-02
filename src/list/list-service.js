@@ -144,6 +144,12 @@ const ListService = {
       .where({ rating_user_id, list_id })
       .then(([rating]) => rating);
   },
+  alreadyInDb(db, animeTitlesArr) {
+    return db('anime')
+      .select('*')
+      .whereIn('title', animeTitlesArr)
+      .returning('*');
+  },
 };
 
 module.exports = ListService;

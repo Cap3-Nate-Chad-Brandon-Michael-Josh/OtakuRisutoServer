@@ -50,21 +50,36 @@ ListRouter.route('/')
 
     await ListService.addList(req.app.get('db'), listObj).then(
       async (result) => {
-        //TO DO: clean this up, unnecessarrily hammering database.
-        //where not in
-        //where title not in (select title from anime)
+        let animeTitlesArr = [];
+        for (let i = 0; i < anime.length; i++) {
+          animeTitlesArr.push(anime[i].title);
+        }
 
-        for (let item of anime) {
-          let exists = await animeService.hasAnimeWithTitle(
-            req.app.get('db'),
-            item.title
-          );
-          if (!exists) {
-            await animeService.addAnime(
-              req.app.get('db'),
-              animeService.serializeAnime(item)
-            );
+        let exists = await ListService.alreadyInDb(
+          req.app.get('db'),
+          animeTitlesArr
+        );
+        let foundArr = [];
+        let notFoundArr = [];
+        for (let i = 0; i < anime.length; i++) {
+          let found = exists.find((item) => item.title === anime[i].title);
+          if (found) {
+            foundArr.push(anime[i]);
+          } else {
+            notFoundArr.push(animeService.serializeAnime(anime[i]));
           }
+        }
+        for (let i = 0; i < exists.length; i++) {
+          let newData = anime.find((item) => item.title === exists[i].title);
+          await animeService.updateAnime(
+            req.app.get('db'),
+            newData,
+            exists[i].anime_id
+          );
+        }
+
+        await animeService.addAnime(req.app.get('db'), notFoundArr);
+        for (let item of anime) {
           let dbAnime = await animeService.getAnimeByTitle(
             req.app.get('db'),
             item.title
