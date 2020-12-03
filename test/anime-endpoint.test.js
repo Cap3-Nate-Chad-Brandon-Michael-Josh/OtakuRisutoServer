@@ -87,6 +87,43 @@ describe('anime endpoint', () => {
             })
         );
     });
+    it('updates anime with new info if anime already exists in database', () => {
+      let updatedAnime = {
+        anime_id: anime.anime_id,
+        title: anime.title,
+        description: 'changed',
+        image_url: anime.image_url,
+        rating: anime.rating,
+        episode_count: anime.episode_count,
+        genre: anime.genre,
+      };
+      return supertest(app)
+        .post('/api/anime')
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .send({ anime: updatedAnime, list_id: animeList.list_id })
+        .expect(201, {
+          anime: {
+            anime_id: anime.anime_id,
+            title: updatedAnime.title,
+            description: updatedAnime.description,
+            image_url: updatedAnime.image_url,
+            rating: updatedAnime.rating,
+            episode_count: updatedAnime.episode_count,
+            genre: updatedAnime.genre,
+          },
+        })
+        .expect(() =>
+          db
+            .from('list_anime')
+            .where({ list_id: animeList.list_id })
+            .then((res) => {
+              expect(res[res.length - 1].anime_id).to.eql(
+                updatedAnime.anime_id
+              );
+              expect(res[res.length - 1].list_anime_id).to.exist;
+            })
+        );
+    });
   });
   describe('DELETE /api/anime', () => {
     beforeEach('insert users', () => {

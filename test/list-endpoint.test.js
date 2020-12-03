@@ -14,6 +14,7 @@ describe('list endpoint', () => {
   const listAnimeArr = helpers.makeListAnimeArray();
   const ratingArr = helpers.makeRatingArray();
   const commentArr = helpers.makeCommentArray();
+  const anime = animeArr[0];
 
   before('make knex instance', () => {
     db = knex({
@@ -117,6 +118,36 @@ describe('list endpoint', () => {
               .where({ list_id: res[res.length - 1].list_id })
               .then((res) => {
                 expect(res).to.eql(helpers.makeExpectedListAnimeArr());
+              });
+          });
+      });
+      it('should update the database with new info for anime already in it when that anime is sent', () => {
+        let updatedAnime = {
+          anime_id: anime.anime_id,
+          title: anime.title,
+          description: 'changed',
+          image_url: anime.image_url,
+          rating: anime.rating,
+          episode_count: anime.episode_count,
+          genre: anime.genre,
+        };
+        let body = {
+          anime: [updatedAnime],
+          name: 'testy',
+          private: false,
+        };
+        return supertest(app)
+          .post('/api/list')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(body)
+          .expect(201)
+          .then(() => {
+            return db
+              .from('anime')
+              .select('*')
+              .where({ title: updatedAnime.title })
+              .then((res) => {
+                expect(res[0].description).to.eql(updatedAnime.description);
               });
           });
       });
