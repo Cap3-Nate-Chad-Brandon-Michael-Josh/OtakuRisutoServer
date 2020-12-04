@@ -464,11 +464,14 @@ function makeExpectedList(list, user) {
     (listAnime) => listAnime.list_id === list.list_id
   );
   let anime = makeExpectedAnimeArr(listAnime);
+  let users = makeUsersArray();
+  let owner = users.find((user) => user.user_id === list.user_id);
   return {
     list_id: list.list_id,
     user_id: list.user_id,
     name: list.name,
     private: list.private,
+    owner_username: owner.username,
     rating: calculateListRating(list),
     user_rating: makeExpectedUserRating(list, user),
     comments: comments,
