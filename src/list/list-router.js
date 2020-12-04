@@ -116,6 +116,11 @@ ListRouter.route('/:id')
           rating = 0;
         }
         list[0].rating = rating;
+        let owner = await ListService.returnOwner(
+          req.app.get('db'),
+          list[0].user_id
+        );
+        list[0].owner_username = owner.username;
         let userRating = await ListService.getUserRating(
           req.app.get('db'),
           req.user.user_id,
