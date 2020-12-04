@@ -477,6 +477,10 @@ describe('list endpoint', () => {
             expectedPublicListArr[i],
             testUser
           );
+          expectedPublicListArr[i].owner = {
+            user_id: testUser.user_id,
+            username: testUser.username,
+          };
         }
         return supertest(app)
           .get(`/api/list/user/${testUser.user_id}`)
