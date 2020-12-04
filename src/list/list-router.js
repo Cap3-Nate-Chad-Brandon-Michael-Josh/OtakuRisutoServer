@@ -280,6 +280,13 @@ ListRouter.route('/user/:user_id').get(async (req, res, next) => {
     }
     result[i].user_rating = userRating.rating;
   }
+  let owner = await ListService.returnOwner(req.app.get('db'), user_id);
+  for (let i = 0; i < result.length; i++) {
+    result[i].owner = {
+      user_id: owner.user_id,
+      username: owner.username,
+    };
+  }
   res.status(200).json(result);
 });
 module.exports = ListRouter;

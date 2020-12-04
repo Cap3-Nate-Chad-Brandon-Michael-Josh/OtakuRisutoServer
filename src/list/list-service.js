@@ -150,6 +150,9 @@ const ListService = {
       .whereIn('title', animeTitlesArr)
       .returning('*');
   },
+  returnOwner(db, user_id) {
+    return db('users').select('*').where({ user_id }).first();
+  },
 };
 
 module.exports = ListService;
