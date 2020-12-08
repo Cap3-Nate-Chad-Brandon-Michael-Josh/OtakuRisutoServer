@@ -39,7 +39,7 @@ The dashboard is where our users will be able to access the majority of our appl
 At the top of the dashboard is a search bar where the user can search by name for specific anime, other users, or other users' lists.
 
 The center of the dashboard will be populated with all the data from a list they selected from the navigation menu.
-![dashboard page](./src/img/screenshots/dashboard.PNG)
+![dashboard page](./src/img/screenshots/dashboard-empty-list.PNG)
 
 APP: User List
 
