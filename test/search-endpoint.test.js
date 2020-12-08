@@ -38,7 +38,9 @@ describe('search endpoint', () => {
       return supertest(app)
         .get(`/api/search/users/${testUser.username}`)
         .set('Authorization', helpers.makeAuthHeader(testUser))
-        .expect([{ username: testUser.username, user_id: testUser.user_id }]);
+        .expect(200, [
+          { username: testUser.username, user_id: testUser.user_id },
+        ]);
     });
   });
   describe('/lists/:term', () => {
@@ -61,7 +63,7 @@ describe('search endpoint', () => {
       return supertest(app)
         .get(`/api/search/lists/${animeList.name}`)
         .set('Authorization', helpers.makeAuthHeader(testUser))
-        .expect([
+        .expect(200, [
           {
             list_id: animeList.list_id,
             name: animeList.name,

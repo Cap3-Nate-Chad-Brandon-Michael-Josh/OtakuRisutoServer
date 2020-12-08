@@ -59,7 +59,7 @@ describe('list endpoint', () => {
         return supertest(app)
           .get('/api/list')
           .set('Authorization', helpers.makeAuthHeader(testUser))
-          .expect(expectedListArr);
+          .expect(200, expectedListArr);
       });
     });
     describe('POST /api/list', () => {
@@ -185,7 +185,7 @@ describe('list endpoint', () => {
         return supertest(app)
           .get(`/api/list/${animeList.list_id}`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
-          .expect(helpers.makeExpectedList(animeList, testUser));
+          .expect(200, helpers.makeExpectedList(animeList, testUser));
       });
     });
     describe('PATCH api/list/:id', () => {
@@ -227,7 +227,7 @@ describe('list endpoint', () => {
           .patch(`/api/list/${animeList.list_id}`)
           .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
           .send(body)
-          .expect({
+          .expect(200, {
             list_id: animeList.list_id,
             user_id: animeList.user_id,
             name: body.name,
@@ -485,7 +485,7 @@ describe('list endpoint', () => {
         return supertest(app)
           .get(`/api/list/user/${testUser.user_id}`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
-          .expect(expectedPublicListArr);
+          .expect(200, expectedPublicListArr);
       });
     });
   });
