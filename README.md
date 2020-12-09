@@ -69,15 +69,16 @@ A user can also search for specific lists by list name.
 
 ### -POST /api/anime
 Expects an anime object containing the title, description, rating, episode count, and an array of genres, and the list_id of the list it goes on. First, we verify that the correct data was sent, and that the user sending it has authority to alter the list they want to add the anime to. If the anime is not currently in the database, it is added to the database. if it is in the database, it is updated with the latest information. Then, the server creates a list_anime entry into the database that connects the anime to the users list with the use of a through table. Endpoint returns the original anime object to the client and a status of 201 on success.
+
 ### -DELETE /api/anime
 Expects a list_anime_id which should be a number. We verify that the user sending the request has authority to alter the list they want to delete the anime from, and if so we delete the entry in the list_anime through table connecting it to their list. This does not delete our information on the anime itself, simply removes it from their list. Returns a 204 status.
 
-### -POST /api/auth/login
+### -POST /api/auth/register
 Expects a username and a password. Looks in database to determine if the credentials are valid, and if so, returns a 200, and an authToken which is a JWT.
-/auth/register
+
 ### -POST /api/auth/login
 Expects a username, password, and email. If the username is available, returns a 201, and a user object containing a serialized version of the username, and the user_id.
-/list
+
 ### -GET /api/list
 Returns all lists belonging to a user as an array. Each list is an object containing the values for name, rating, user_rating, and private, which are a string, a number, a number, and a boolean.
 
@@ -86,6 +87,7 @@ Expects a name string, and a private boolean. Optionally, can take an array of a
 
 ### -GET /api/list/:id
 Returns a list object containing the name string, private boolean, owner_username string, rating integer, user_rating integer, an array of comment objcts containing the comment string and username string, an array of list_anime objects containing the list_id integer and anime_id integer, and and an anime array, each being an object containing the title, description, rating, episode count, and an array of genres.
+
 ### -PATCH /api/list/:id
 Expects a name string and private boolean, verifies the user has authority to alter the list, and if so updates the database entry for the list with the new name and private. Returns 200 and an item object containing the name string, private boolean, owner_username string, rating integer, user_rating integer, an array of comment objcts containing the comment string and username string, an array of list_anime objects containing the list_id integer and anime_id integer, and and an anime array, each being an object containing the title, description, rating, episode count, and an array of genres.
 
