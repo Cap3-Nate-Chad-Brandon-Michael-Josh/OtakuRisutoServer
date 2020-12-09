@@ -3,6 +3,7 @@
 Live link: https://otaku-risuto.vercel.app/
 Demo Username: DemoUser
 Demo Password: P@ssword1
+
 ## INTRODUCTION: Why OtakuRisuto
 
 Welcome to OtakuRisuto, your home to manage, track, and make progress on all the anime you have put on the backburner
@@ -63,6 +64,32 @@ A user can also search for specific user by their username and see all the lists
 ![user search](./src/img/screenshots/search-user.PNG)
 
 A user can also search for specific lists by list name.
+
+## API
+
+-POST Expects an anime object containing the title, description, rating, episode count, and an array of genres, and the list_id of the list it goes on. First, we verify that the correct data was sent, and that the user sending it has authority to alter the list they want to add the anime to. If the anime is not currently in the database, it is added to the database. if it is in the database, it is updated with the latest information. Then, the server creates a list_anime entry into the database that connects the anime to the users list with the use of a through table. Endpoint returns the original anime object to the client and a status of 201 on success.
+-DELETE Expects a list_anime_id which should be a number. We verify that the user sending the request has authoirty to alter the list they want to delete the anime from, and if so we delete the entry in the list_anime through table connecting it to their list. This does not delete our information on the anime itself, simply removes it from their list. Returns a 204 status.
+/auth/login
+-POST Expects a username and a password. Looks in database to determine if the credentials are valid, and if so, returns a 200, and an authToken which is a JWT.
+/auth/register
+-POST Expects a username, password, and email. If the username is available, returns a 201, and a user object containing a serialized version of the username, and the user_id.
+/list
+-GET Returns all lists belonging to a user as an array. Each list is an object containing the values for name, rating, user_rating, and private, which are a string, a number, a number, and a boolean.
+-POST Expects a name string, and a private boolean. Optionally, can take an array of anime objects containing the title, description, rating, episode count, and an array of genres. Adds any anime not in the database to the database, and updates any that are in the database with latest information. Creates an entry for each anime in the list_anime through table to connect them to the list. Returns 201 and a string "List successfulyl added" upon success.
+/list/:id
+-GET Returns a list object containing the name string, private boolean, owner_username string, rating integer, user_rating integer, an array of comment objcts containing the comment string and username string, an array of list_anime objects containing the list_id integer and anime_id integer, and and an anime array, each being an object containing the title, description, rating, episode count, and an array of genres.
+-PATCH Expects a name string and private boolean, verifies the user has authority to alter the list, and if so updates the database entry for the list with the new name and private. Returns 200 and an item object containing the name string, private boolean, owner_username string, rating integer, user_rating integer, an array of comment objcts containing the comment string and username string, an array of list_anime objects containing the list_id integer and anime_id integer, and and an anime array, each being an object containing the title, description, rating, episode count, and an array of genres.
+-DELETE Expects a list_id integer, verifies the user has authority to alter the list, and if so, deletes the list from the database, returns 204.
+/list/comment
+-POST Expects a comment string and a list_id integer. Adds a new comment to the databse corresponding to the list_id, and returns 201, and a copy of the comment added to database.
+/list/rating
+-POST Expects rating integer, and list_id integer. Checks if user has already rated list at list_id. If not, adds a new rating to rating table for their rating of list, if so, updates previous rating. Returns an object containing rating_user_id integer, rating integer, and list_id integer.
+/list/user/:user_id
+-GET Returns 200 and all lists belonging to a user where private value is false as an array. Each list is an object containing the values for name, rating, user_rating, and private, which are a string, a number, a number, and a boolean.
+/search/users/:term
+-GET Returns 200 and an array of all users whose username contains the search term.
+/search/lists/:term
+-GET Returns 200 and an array of all lists whose name contains the search term.
 
 ## TECHNOLOGY:
 
