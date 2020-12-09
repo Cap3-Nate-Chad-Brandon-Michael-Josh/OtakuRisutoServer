@@ -92,19 +92,19 @@ Expects a name string and private boolean, verifies the user has authority to al
 ### -DELETE /api/list/:id
 Expects a list_id integer, verifies the user has authority to alter the list, and if so, deletes the list from the database, returns 204.
 
-### -POST /list/comment
+### -POST /api/list/comment
 Expects a comment string and a list_id integer. Adds a new comment to the databse corresponding to the list_id, and returns 201, and a copy of the comment added to database.
 
-### -POST /list/rating
+### -POST /api/list/rating
 Expects rating integer, and list_id integer. Checks if user has already rated list at list_id. If not, adds a new rating to rating table for their rating of list, if so, updates previous rating. Returns an object containing rating_user_id integer, rating integer, and list_id integer.
 
-### -GET /list/user/:user_id
+### -GET /api/list/user/:user_id
 Returns 200 and all lists belonging to a user where private value is false as an array. Each list is an object containing the values for name, rating, user_rating, and private, which are a string, a number, a number, and a boolean.
 
-### -GET /search/users/:term
+### -GET /api/search/users/:term
 Returns 200 and an array of all users whose username contains the search term.
 
-### -GET /search/lists/:term
+### -GET /api/search/lists/:term
 Returns 200 and an array of all lists whose name contains the search term.
 
 ## TECHNOLOGY:
