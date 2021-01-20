@@ -39,6 +39,15 @@ const authService = {
       algorithm: 'HS256',
     });
   },
+  updatePassword: async function (db, username, newPassword) {
+    let hashedPassword = await this.hashPassword(newPassword);
+    return db('users')
+      .where({ username })
+      .update({
+        password: hashedPassword,
+      })
+      .returning('*');
+  },
   hasUserWithUserName(db, username) {
     return db('users')
       .where({ username })
