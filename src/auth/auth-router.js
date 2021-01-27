@@ -67,7 +67,7 @@ authRouter.route('/register').post(express.json(), (req, res, next) => {
         .catch(next);
     });
 });
-authRouter.route('/password').post(express.json(), (req, res, next) => {
+authRouter.route('/password').post((req, res, next) => {
   const { email } = req.body;
   if (!email) {
     return res.status(400).json({ error: 'Please submit a valid email' });
@@ -98,7 +98,7 @@ authRouter.route('/password').post(express.json(), (req, res, next) => {
   });
   res.status(204).send('Success');
 });
-authRouter.route('/reset').post(express.json(), (req, res, next) => {
+authRouter.route('/reset').patch(express.json(), (req, res, next) => {
   const { token, password } = req.body;
   for (const field of ['token', 'password'])
     if (!req.body[field])
@@ -110,9 +110,14 @@ authRouter.route('/reset').post(express.json(), (req, res, next) => {
     return res.status(400).json({ error: passwordError });
   }
 
-  const payload = authService.verifyPasswordJWT(token);
-
-  authService.updatePassword(req.app.get('db'), payload.sub, password);
-  res.status(201).send();
+  const passwordPayload = authService.verifyPasswordJWT(token);
+  authService.updatePassword(req.app.get('db'), passwordPayload.sub, password);
+  authService
+    .getUserWithUsername(req.app.get('db'), passwordPayload.sub)
+    .then((user) => {
+      const sub = user.username;
+      const payload = { user_id: user.user_id };
+      res.send({ authToken: authService.createJWT(sub, payload) });
+    });
 });
 module.exports = authRouter;
