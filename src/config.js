@@ -7,4 +7,5 @@ module.exports = {
   PASSWORD_SECRET: process.env.PASSWORD_SECRET,
   EMAIL_USER: process.env.EMAIL_USER,
   EMAIL_PASS: process.env.EMAIL_PASS,
+  JWT_EXPIRY: process.env.JWT_EXPIRY || 600,
 };

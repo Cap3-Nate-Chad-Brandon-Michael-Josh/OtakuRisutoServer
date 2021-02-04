@@ -31,6 +31,7 @@ const authService = {
   createPasswordJWT(subject, payload) {
     return jwt.sign(payload, config.PASSWORD_SECRET, {
       subject,
+      expiresIn: config.JWT_EXPIRY,
       algorithm: 'HS256',
     });
   },
