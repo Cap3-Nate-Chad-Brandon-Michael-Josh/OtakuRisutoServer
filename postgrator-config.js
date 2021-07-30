@@ -12,4 +12,7 @@ module.exports = {
       : process.env.DATABASE_NAME,
   username: process.env.DATABASE_USER,
   password: process.env.DATABASE_PASS,
+  connectionString: (process.env.NODE_ENV === 'test')
+    ? process.env.TEST_DATABASE_URL
+    : process.env.DATABASE_URL,
 };
