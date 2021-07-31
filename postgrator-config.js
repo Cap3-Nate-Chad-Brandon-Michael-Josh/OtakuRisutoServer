@@ -1,10 +1,6 @@
 /* eslint-disable quotes */
 require("dotenv").config();
 
-const parse = require('pg-connection-string').parse;
-const pgconfig = parse(DATABASE_URL + "?sslmode=require");
-pgconfig.ssl = { rejectUnauthorized: false };
-
 module.exports = {
   migrationDirectory: "migrations",
   driver: "pg",
@@ -18,5 +14,5 @@ module.exports = {
   password: process.env.DATABASE_PASS,
   connectionString: (process.env.NODE_ENV === 'test')
     ? process.env.TEST_DATABASE_URL
-    : pgconfig,
+    : process.env.DATABASE_URL,
 };
