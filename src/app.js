@@ -25,7 +25,12 @@ app.use("/api/search", searchRouter);
 app.use(function errorHandler(error, req, res, next) {
   let response;
   if (NODE_ENV === "production") {
-    response = { error: { message: "server error" } };
+    if (error.message){
+      response = {error: { message: error.message }};
+    } else {
+      response = { error: { message: "server error" } };
+    }
+    
   } else {
     console.error(error);
     response = { message: error.message, error };
